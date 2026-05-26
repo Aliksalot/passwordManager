@@ -24,10 +24,9 @@ namespace utils {
           cipherArguments.add(line[j]);
         }
 
-        auto cipher = encrypt::CypherFactory::create(
-          stringToCipherType(line[3]),
-          cipherArguments
-        )
+        auto cipher = encrypt::CipherFactory::create(
+          encrypt::CipherConfig(stringToCipherType(line[3]), cipherArguments)
+        );
 
         l.add(core::PasswordEntry(
           line[0], line[1], line[2],
@@ -49,26 +48,25 @@ namespace utils {
       return result;
     }
     static clib::String serializeHeader (
-      encrypt::CipherType t,
-      clib::List<clib::String>& conf
+      const encrypt::Cypher* c
     ) {
-      clib::String header = cipherTypeToString(t) + " " + c->serialize();
+      clib::String header = cipherTypeToString(c->type()) + " " + c->serialize();
       return header;
     }
-    static encrypt::Cypher* deserializeHeader (clib::String raw) {
-      clib::List<clib::String> args = raw.split(' ');
 
+    static encrypt::CipherConfig deserializeHeader (clib::String raw) {
+      clib::List<clib::String> args = raw.split(' ');
       if(args.size() == 0)
         throw utils::InvalidCipherTypeException("File header possibly corrupted");
       encrypt::CipherType type = stringToCipherType(args[0]);
-      //TODO Little sloppy but ok, maybe fix if enough time
       args.remove(0);
-
-      return encrypt::CipherFactory::create(type, args);
+      return encrypt::CipherConfig(type, args);
     }
+
     static clib::String cipherTypeToString (encrypt::CipherType t) {
       switch(t) {
         case encrypt::CipherType::TestCipher: return clib::String("test_cypher");
+        case encrypt::CipherType::CaesarCipher: return clib::String("caesar_cypher");
         default: 
           throw utils::InvalidCipherTypeException();
       }
@@ -76,6 +74,8 @@ namespace utils {
     static encrypt::CipherType stringToCipherType (const clib::String& s) {
       if(s == cipherTypeToString(encrypt::CipherType::TestCipher))
         return encrypt::CipherType::TestCipher;
+      if(s == cipherTypeToString(encrypt::CipherType::CaesarCipher))
+        return encrypt::CipherType::CaesarCipher;
 
       throw utils::InvalidCipherTypeException();
     }

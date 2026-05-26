@@ -3,6 +3,7 @@
 #include"./Password.h"
 #include"../utils/array.h"
 #include"../encrypt/Cypher.h"
+#include"../encrypt/CipherConfig.h"
 #include"../utils/Serializer.h"
 
 namespace core{
@@ -25,8 +26,7 @@ namespace core{
 
     void createFile(
       encrypt::CipherType t,
-      const clib::String& filePassword,
-      const clib::List<clib::String>& conf = clib::List<clib::String>()
+      const clib::String& filePassword
     );
     void load(const clib::String& filePassword);
     void save();
@@ -43,7 +43,7 @@ namespace core{
 
   inline PasswordFile::PasswordFile() {};
 
-  inline PasswordFile::PasswordFile(encrypt::Cypher* c): cipher(c) {};
+  inline PasswordFile::PasswordFile(clib::String path): path(path) {};
 
   inline clib::List<PasswordEntry> PasswordFile::find(
       const clib::String& website,
@@ -86,19 +86,34 @@ namespace core{
     return *this;
   };
 
-  inline void PasswordFile::save() const {
+  inline void PasswordFile::createFile(
+    encrypt::CipherType t,
+    const clib::String& filePassword
+  ) {
+    //Nqmame cipher - suzdawame
+  }
+
+  inline void PasswordFile::save() {
+    //veche imame cipher
 
     clib::String content;
-    content += serializeHeader(cipher) + "\n";
+    content += utils::Serializer::serializeHeader(cipher) + "\n";
     auto encryptedPasswords = cipher->encrypt(
-      utils::Serializer::serializePasswords(passwords);
+      utils::Serializer::serializePasswords(passwords)
     );
     content += encryptedPasswords;
 
   }
-  inline void PasswordFile::load(const clib::String& filePassword) const {
-    //get enc type
-    
+  inline void PasswordFile::load(const clib::String& filePassword) {
+    //ima li cypher?
+    if(cipher) {
+      //veche sme go cheli
+
+    }else {
+      //za sefte go vijdame
+      encrypt::CipherConfig conf = utils::Serializer::deserializeHeader("");
+      cipher = encrypt::CipherFactory::create(encrypt::CipherConfig(conf, filePassword));
+    }
   }
 
 }

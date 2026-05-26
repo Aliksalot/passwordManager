@@ -4,5 +4,6 @@
 namespace encrypt{
   enum class CipherType {
     TestCipher,
+    CaesarCipher
   };
 }

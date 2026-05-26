@@ -26,6 +26,8 @@ namespace clib{
     bool operator!=(const String& s) const;
     bool operator!=(const char* s) const;
 
+    long long toInt() const;
+
     List<String> split(char c) const;
 
     bool empty() const;
@@ -99,6 +101,28 @@ namespace clib{
     return !(*this == s);
   }
 
+  inline long long String::toInt() const {
+    if(size() == 0 || (size() == 1 && l[0] == '-'))
+      throw std::invalid_argument("Not an integer");
+    
+    signed sign = 1;
+    std::size_t i = 0;
+
+    if(l[0] == '-') {
+      i = 1;
+      sign = -1;
+    }
+
+    long long r = 0;
+    for(; i < size(); i ++) {
+      if(l[i] < '0' || l[i] > '9')
+        throw std::invalid_argument("Not an integer");
+
+      r = r * 10 + (l[i] - '0');
+    }
+
+    return r * sign;
+  }
   //TODO pretty heavy, if time allows fix it
   inline List<String> String::split(char c) const {
     List<String> out;

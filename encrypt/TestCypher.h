@@ -11,6 +11,7 @@ namespace encrypt {
     TestCypher* clone() const override;
     CipherType type() const override;
     clib::String serialize() const override;
+    static clib::String fromPassword(const clib::String& password);
   private:
     clib::String secretword;
   };
@@ -33,6 +34,10 @@ namespace encrypt {
   };
   TestCypher* TestCypher::clone() const {
     return new TestCypher(secretword);
+  }
+
+  clib::String fromPassword(const clib::String& password) {
+    return password;
   }
   
 }
