@@ -1,0 +1,265 @@
+#pragma once
+
+#include<cstddef>
+#include<stdexcept>
+
+namespace clib {
+
+  template<typename T>
+  class List {
+
+    public:
+      List();
+      List(const T* arr, std::size_t len);
+      ~List();
+
+      void add(const T& item);
+
+      List(const List& l);
+      List& operator=(const List& l);
+      List(List&& l) noexcept;
+      List& operator=(List&& l) noexcept;
+
+      T& operator[](std::size_t index);
+      const T& operator[](std::size_t index) const;
+
+      void extend(const List<T>& list);
+      void clear();
+      List& remove(std::size_t st, std::size_t items = 1);
+      bool contains(const T& item) const;
+      std::size_t size() const;
+      //TODO 
+      long indexOf(const T& item) const;
+      bool empty() const;
+
+    private:
+      T* data = nullptr;
+      std::size_t count = 0;
+      std::size_t cap = 0;
+
+      void expand();
+      void reserve(std::size_t space);
+      bool indexInBounds(std::size_t index) const;
+      bool full() const;
+
+      //TODO abstract memory management
+      /**Destroys all objects in data and sets count to 0. Doesn't delete data*/
+      void clear_data(std::size_t st = 0);
+      /**Calls delete on data. Does NOT destruct T objects, only frees memory*/
+      void delete_data();
+      /**
+       * Allocates memory and stores address in data pointer.
+       * Doesn't call T constructor.
+       * */
+      T* construct_data(std::size_t size);
+  };
+
+  //-------DEFINITIONS------
+
+  template<typename T>
+  void List<T>::clear() {
+    clear_data();
+  }
+
+  template<typename T>
+  void List<T>::delete_data() {
+    ::operator delete(data);
+    data = nullptr;
+  }
+
+  template<typename T>
+  T* List<T>::construct_data(std::size_t size) {
+    return static_cast<T*>(::operator new(sizeof(T) * size));
+  }
+  template<typename T>
+  void List<T>::clear_data(std::size_t st) {
+    if(st >= count) return;
+
+    for(std::size_t i = st; i < count; i ++) {
+      data[i].~T();
+    }
+    count = st;
+  }
+
+  template<typename T>
+  void List<T>::reserve(std::size_t space) {
+
+    if(space <= cap) return;
+
+    T* temp = construct_data(space);
+    std::size_t tempCount = count;
+
+    for(std::size_t i = 0; i < count; i ++) {
+      new (temp + i) T(std::move_if_noexcept(data[i]));
+    }
+
+    clear_data();
+    delete_data();
+
+    data = temp;
+    count = tempCount;
+    cap = space;
+  }
+
+  template<typename T>
+  void List<T>::expand() {
+    reserve(cap == 0 ? 1 : cap * 2);
+  }
+
+  template<typename T>
+  List<T>::List(const T* arr, std::size_t len) {
+    reserve(len);
+    
+    for(std::size_t i = 0; i < len; i ++) {
+      new (data + i) T(arr[i]);
+    }
+
+    count = len;
+  }
+
+  template<typename T>
+  List<T>::List() {}
+
+  template<typename T>
+  List<T>::~List() {
+    clear_data();
+    delete_data();
+  }
+
+  template<typename T>
+  void List<T>::add(const T& item) {
+    if(full()) expand();
+
+    new (data + count) T(item);
+    count ++; 
+  }
+
+  //TODO Try/catch and implement rollback
+  template<typename T>
+  void List<T>::extend(const List<T>& list) {
+    reserve(count + list.size());
+    for(std::size_t i = 0; i < list.size(); i ++){
+      new (data + count) T(list[i]);
+      count ++;
+    }
+  };
+
+  template<typename T>
+  List<T>::List(const List& l) {
+    reserve(l.cap);
+    count = l.count;
+    for(std::size_t i = 0; i < l.count; i ++) {
+      new (data + i) T(l.data[i]);
+    }
+  }
+  template<typename T>
+  List<T>& List<T>::operator=(const List& l) {
+    if(&l == this) return *this;
+
+    clear_data();
+    reserve(l.cap);
+
+    for(std::size_t i = 0; i < l.count; i ++) {
+      new (data + i) T(l.data[i]);
+      count ++;
+    }
+    return *this;
+  }
+
+  template<typename T>
+  List<T>::List(List&& l) noexcept{
+    data = l.data;
+    count = l.count;
+    cap = l.cap;
+    l.data = nullptr;
+    l.cap = 0;
+    l.count = 0;
+  }
+
+  template<typename T>
+  List<T>& List<T>::remove(std::size_t st, std::size_t items) {
+    if(st >= count || items > count - st) return *this;
+    
+    for(std::size_t i = 0; i < count - st - items; i ++) {
+      T temp = std::move(data[st + i]);
+      data[st + i] = std::move(data[st + items + i]);
+      data[st + items + i] = std::move(temp);
+    }
+    clear_data(count - items);
+    return *this;
+  }
+
+  template<typename T>
+  long List<T>::indexOf(const T& item) const {
+    for(std::size_t i = 0; i < count; i ++) {
+      if(data[i] == item) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  template<typename T>
+  List<T>& List<T>::operator=(List&& l) noexcept{
+    if(this == &l) return *this;
+
+    clear_data();
+    delete_data();
+
+    data = l.data;
+    count = l.count;
+    cap = l.cap;
+
+    l.data = nullptr;
+    l.cap = 0;
+    l.count = 0;
+
+    return *this;
+  }
+
+  template<typename T>
+  T& List<T>::operator[](std::size_t index) {
+    if(indexInBounds(index)) {
+        return data[index];
+    }
+    throw std::out_of_range("index out of bounds");
+  }
+
+  template<typename T>
+  const T& List<T>::operator[](std::size_t index) const{
+    if(indexInBounds(index)) {
+        return data[index];
+    }
+    throw std::out_of_range("index out of bounds");
+  }
+
+
+  template<typename T>
+  bool List<T>::contains(const T& item) const {
+    for(std::size_t i = 0; i < count; i ++) {
+      if(data[i] == item) return true;
+    }
+    return false;
+  }
+
+  template<typename T>
+  std::size_t List<T>::size() const{
+    return count;
+  }
+
+  template<typename T>
+  bool List<T>::indexInBounds(std::size_t index) const {
+    return index < count;
+  }
+
+  template<typename T>
+  bool List<T>::full() const {
+    return cap == count;
+  }
+
+  template<typename T>
+  bool List<T>::empty() const {
+    return count == 0;
+  }
+}
+
