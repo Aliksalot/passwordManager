@@ -26,6 +26,8 @@ namespace clib{
     bool operator!=(const String& s) const;
     bool operator!=(const char* s) const;
 
+    List<String> split(char c) const;
+
     bool empty() const;
 
     void clear();
@@ -96,6 +98,24 @@ namespace clib{
   inline bool String::operator!=(const char* s) const {
     return !(*this == s);
   }
+
+  //TODO pretty heavy, if time allows fix it
+  inline List<String> String::split(char c) const {
+    List<String> out;
+    String temp;
+    std::size_t stringLength = size();
+    for(std::size_t i = 0; i < stringLength; i ++) {
+      if(l[i] == c) {
+        out.add(temp);
+        temp = "";
+        continue;
+      }
+
+      temp += l[i];
+    }
+    out.add(temp);
+    return out;
+  }
   inline std::ostream& operator<<(std::ostream& stream, const String& s) {
     for(std::size_t i = 0; i < s.size(); i ++) {
       stream << s[i];
@@ -114,5 +134,6 @@ namespace clib{
 
     return stream;
   }
+
 }
 
