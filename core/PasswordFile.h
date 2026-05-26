@@ -10,25 +10,34 @@ namespace core{
 
   public:
     PasswordFile();
-    PasswordFile(encrypt::Cypher* c);
-    clib::List<PasswordEntry> find(const clib::String& website = "", const clib::String& user = "");
+    PasswordFile(clib::String path);
+
+    clib::List<PasswordEntry> find(
+      const clib::String& website = "",
+      const clib::String& user = ""
+    );
     PasswordFile& remove(const clib::String& website, const clib::String& user = "");
     PasswordFile& update(const PasswordEntry& p);
-
-    void saveFile() const;
 
     //disable copy
     PasswordFile(const PasswordFile&) = delete;
     PasswordFile& operator=(const PasswordFile&) = delete;
 
-    void save() const;
-    void open() const;
-    void close() const;
+    void createFile(
+      encrypt::CipherType t,
+      const clib::String& filePassword,
+      const clib::List<clib::String>& conf = clib::List<clib::String>()
+    );
+    void load(const clib::String& filePassword);
+    void save();
 
+    bool hasUnsavedData() const;
   private:
     clib::List<PasswordEntry> passwords;
     clib::String path;
     encrypt::Cypher* cipher;
+
+    bool hasUnsaved = false;
   };
 
 
@@ -65,6 +74,8 @@ namespace core{
     return *this;
   };
 
+
+  //TODO Not a good implementation
   inline PasswordFile& PasswordFile::update(const PasswordEntry& p) {
     if(long i = passwords.indexOf(p) >= 0) {
       passwords[i] = p;
@@ -77,14 +88,17 @@ namespace core{
 
   inline void PasswordFile::save() const {
 
-    //First line header - cypher method and metadata
-    //Body blob <- encrypt <- serialize
-  }
-  inline void PasswordFile::open() const {
+    clib::String content;
+    content += serializeHeader(cipher) + "\n";
+    auto encryptedPasswords = cipher->encrypt(
+      utils::Serializer::serializePasswords(passwords);
+    );
+    content += encryptedPasswords;
 
   }
-  inline void PasswordFile::close() const {
-
+  inline void PasswordFile::load(const clib::String& filePassword) const {
+    //get enc type
+    
   }
 
 }

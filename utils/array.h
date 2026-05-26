@@ -178,13 +178,12 @@ namespace clib {
 
   template<typename T>
   List<T>& List<T>::remove(std::size_t st, std::size_t items) {
-    if(st >= count || items > count - st) return *this;
+    if(st >= count || items == 0 || items > count - st) return *this;
     
-    for(std::size_t i = 0; i < count - st - items; i ++) {
-      T temp = std::move(data[st + i]);
-      data[st + i] = std::move(data[st + items + i]);
-      data[st + items + i] = std::move(temp);
+    for(std::size_t i = st; i < count - items; i ++) {
+      data[i] = std::move(data[items]);
     }
+
     clear_data(count - items);
     return *this;
   }

@@ -11,14 +11,48 @@
 namespace utils {
   class Serializer {
   public:
-    static clib::List<core::PasswordEntry> deserializePasswords (clib::String raw) {
-      return clib::List<core::PasswordEntry>();
+    static clib::List<core::PasswordEntry> deserializePasswords (const clib::String& raw) {
+      clib::List<core::PasswordEntry> l;
+      auto lines = raw.split('\n');
+      for(std::size_t i = 0; i < lines.size(); i ++) {
+        auto line = lines[i].split(' ');
+        if(line.size() < 4) 
+          throw std::invalid_argument("File possibly corrupted, line format is invalid!");
+
+        clib::List<clib::String> cipherArguments;
+        for(std::size_t j = 4; j < line.size(); j ++) {
+          cipherArguments.add(line[j]);
+        }
+
+        auto cipher = encrypt::CypherFactory::create(
+          stringToCipherType(line[3]),
+          cipherArguments
+        )
+
+        l.add(core::PasswordEntry(
+          line[0], line[1], line[2],
+          cipher
+        ));
+      }
+
+      return l;
     }
     static clib::String serializePasswords (clib::List<core::PasswordEntry> data) {
-      return clib::String("");
+      clib::String result;
+      auto passCount = data.size();
+      for(std::size_t i = 0; i < passCount; i ++) {
+        const encrypt::Cypher* c = data[i].getCipher();
+        result +=
+          data[i].getWebsite() + " " + data[i].getUsername() + " " + data[i].getPasswordEncrypted()
+            + " " + cipherTypeToString(c->type()) + " " + c->serialize() + "\n";
+      }
+      return result;
     }
-    static clib::String serializeHeader (const encrypt::Cypher* c) {
-      clib::String header = cipherTypeToString(c->type()) + " " + c->serialize();
+    static clib::String serializeHeader (
+      encrypt::CipherType t,
+      clib::List<clib::String>& conf
+    ) {
+      clib::String header = cipherTypeToString(t) + " " + c->serialize();
       return header;
     }
     static encrypt::Cypher* deserializeHeader (clib::String raw) {
