@@ -26,6 +26,7 @@ namespace clib {
       void extend(const List<T>& list);
       void clear();
       List& remove(std::size_t st, std::size_t items = 1);
+      T pop();
       bool contains(const T& item) const;
       std::size_t size() const;
       //TODO 
@@ -187,6 +188,14 @@ namespace clib {
     clear_data(count - items);
     return *this;
   }
+
+  template<typename T>
+    T List<T>::pop() {
+      T temp = std::move(data[count - 1]);
+      clear_data(count - 1);
+
+      return temp;
+    }
 
   template<typename T>
   long List<T>::indexOf(const T& item) const {

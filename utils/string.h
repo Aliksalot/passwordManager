@@ -35,29 +35,34 @@ namespace clib{
     void clear();
     std::size_t size() const;
 
+    const char* raw() const;
+
   private:
     List<char> l;
   };
 
   inline void String::clear() {
     l.clear();
+    l.add('\0);
   }
   inline std::size_t String::size() const {
-    return l.size();
+    return l.size() - 1;
   }
 
-  inline String::String() { };
+  inline String::String() { l.add('\0'); };
   inline String::String(const char* s): String(s, std::strlen(s)) { };
   inline String::String(const char* s, std::size_t len) {
     l = List<char>(s, len);
+    l.add('\0');
   }
 
   inline bool String::empty() const {
-    return l.empty();
+    return size() == 0;
   }
 
   inline String& String::operator=(const char* s) {
     l = List<char>(s, std::strlen(s));
+    l.add('\0');
     return *this;
   }
   inline char& String::operator[](std::size_t index) {
@@ -68,11 +73,15 @@ namespace clib{
     return l[index];
   }
   inline String& String::operator+=(const String& s) {
+    l.pop();
     l.extend(s.l);
+    l.add('\0');
     return *this;
   }
   inline String& String::operator+=(char c) {
+    l.pop();
     l.add(c);
+    l.add('\0');
     return *this;
   }
   inline String& String::operator+=(const char* s) {
@@ -158,6 +167,11 @@ namespace clib{
 
     return stream;
   }
+
+  inline const char* String::raw() const{
+    return &l[0];
+  }
+  
 
 }
 
