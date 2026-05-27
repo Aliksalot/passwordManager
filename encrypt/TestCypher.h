@@ -23,7 +23,7 @@ namespace encrypt {
   }
 
   clib::String TestCypher::serialize() const {
-    return secretword;
+    return "";
   }
 
   clib::String TestCypher::encrypt(const clib::String& text) const{
@@ -36,7 +36,7 @@ namespace encrypt {
     return new TestCypher(secretword);
   }
 
-  clib::String fromPassword(const clib::String& password) {
+  clib::String TestCypher::fromPassword(const clib::String& password) {
     return password;
   }
   

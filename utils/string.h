@@ -43,7 +43,7 @@ namespace clib{
 
   inline void String::clear() {
     l.clear();
-    l.add('\0);
+    l.add('\0');
   }
   inline std::size_t String::size() const {
     return l.size() - 1;

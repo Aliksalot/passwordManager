@@ -1,5 +1,8 @@
 #pragma once
 
+#include<fstream>
+#include<iostream>
+
 #include"./Password.h"
 #include"../utils/array.h"
 #include"../encrypt/Cypher.h"
@@ -10,8 +13,9 @@ namespace core{
   class PasswordFile{
 
   public:
-    PasswordFile();
+    PasswordFile() = delete;
     PasswordFile(clib::String path);
+    ~PasswordFile();
 
     clib::List<PasswordEntry> find(
       const clib::String& website = "",
@@ -24,10 +28,7 @@ namespace core{
     PasswordFile(const PasswordFile&) = delete;
     PasswordFile& operator=(const PasswordFile&) = delete;
 
-    void createFile(
-      encrypt::CipherType t,
-      const clib::String& filePassword
-    );
+    void createFile(const encrypt::CipherConfig& config);
     void load(const clib::String& filePassword);
     void save();
 
@@ -35,13 +36,14 @@ namespace core{
   private:
     clib::List<PasswordEntry> passwords;
     clib::String path;
-    encrypt::Cypher* cipher;
+    encrypt::Cypher* cipher = nullptr;
 
     bool hasUnsaved = false;
   };
 
-
-  inline PasswordFile::PasswordFile() {};
+  inline PasswordFile::~PasswordFile() {
+    delete cipher;
+  }
 
   inline PasswordFile::PasswordFile(clib::String path): path(path) {};
 
@@ -87,22 +89,50 @@ namespace core{
   };
 
   inline void PasswordFile::createFile(
-    encrypt::CipherType t,
-    const clib::String& filePassword
+    const encrypt::CipherConfig& config
   ) {
-    //Nqmame cipher - suzdawame
+
+    if(config.password.empty())
+      throw std::runtime_error("Files must be password protected!");
+
+    std::cout << config.password << " " << config.password.empty() << "\n";
+    std::cout << utils::Serializer::cipherTypeToString(config.type) << "\n";
+
+    auto newCipher = encrypt::CipherFactory::create(config);
+
+    delete cipher;
+    cipher = newCipher;
+
+    std::ofstream file("./test");
+
+    std::cout << path.raw() << std::endl;
+
+    if(!file)
+      throw std::runtime_error("Error when opening file to create");
+
+    std::cout << "Created file!" << std::endl;
   }
 
   inline void PasswordFile::save() {
-    //veche imame cipher
 
-    clib::String content;
-    content += utils::Serializer::serializeHeader(cipher) + "\n";
-    auto encryptedPasswords = cipher->encrypt(
+    if(!cipher)
+      throw std::runtime_error("PasswordFile isn't intialized! ");
+
+    std::ofstream file(path.raw());
+
+    if(!file)
+      throw std::runtime_error("Error when opening file to save");
+
+    file << utils::Serializer::serializeHeader(cipher);
+    file << "\n";
+
+    clib::String encryptedPasswords = cipher->encrypt(
       utils::Serializer::serializePasswords(passwords)
     );
-    content += encryptedPasswords;
 
+    file << encryptedPasswords;
+
+    hasUnsaved = false;
   }
   inline void PasswordFile::load(const clib::String& filePassword) {
     //ima li cypher?
