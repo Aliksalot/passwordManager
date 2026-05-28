@@ -27,6 +27,9 @@ namespace clib{
     bool operator!=(const char* s) const;
 
     long long toInt() const;
+    static String fromInt(long long i);
+
+    String& insert(std::size_t at, char c);
 
     List<String> split(char c) const;
 
@@ -137,6 +140,25 @@ namespace clib{
 
     return r * sign;
   }
+
+  inline String String::fromInt(long long i) {
+    if(i == 0) return "0";
+
+    String r;
+    bool neg = i < 0;
+    if(neg) i = -i;
+
+    while(i > 0) {
+      char c = (i % 10) + '0';
+      r.insert(0, c);
+      i /= 10;
+    }
+
+    if(neg) r.insert(0, '-');
+
+    return r;
+  }
+
   //TODO pretty heavy, if time allows fix it
   inline List<String> String::split(char c) const {
     List<String> out;
@@ -154,6 +176,12 @@ namespace clib{
     out.add(temp);
     return out;
   }
+
+  inline String& String::insert(std::size_t at, char c) {
+    l.insert(at, c);
+    return *this;
+  }
+
   inline std::ostream& operator<<(std::ostream& stream, const String& s) {
     for(std::size_t i = 0; i < s.size(); i ++) {
       stream << s[i];

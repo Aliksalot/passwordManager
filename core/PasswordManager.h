@@ -5,7 +5,8 @@
 #include"./PasswordFile.h"
 #include"./Password.h"
 #include"../encrypt/CipherTypeUtils.h"
-#include"../encrypt/TestCypher.h"
+#include"../encrypt/ciphers/TestCypher.h"
+#include"../encrypt/ciphers/CaesarCipher.h"
 #include<iostream>
 
 namespace core{
@@ -15,7 +16,7 @@ namespace core{
   public:
     PasswordManager() {
       f.createFile(
-        new encrypt::TestCypher("Helloa"),
+        new encrypt::CaesarCipher(22),
         "password"
       );
 
@@ -25,14 +26,17 @@ namespace core{
       f.save("password");
 
       try{
-        f.load("password");
+        f.load("kur");
         std::cout << encrypt::cipherTypeToString(f.getDefaultCipher()->type()) << " " << f.getDefaultCipher()->serialize() << std::endl;
         auto pws = f.find();
         for(auto i = 0; i < pws.size(); i ++) {
           std::cout << pws[i].serialize() << std::endl;
+          std::cout << "Decrypted: " << pws[i].getCipher()->decrypt(pws[i].getPasswordEncrypted()) << std::endl;
         }
       }catch(const utils::InvalidCipherTypeException& e) {
         std::cout << e.what() << std::endl;
+      }catch(...) {
+        std::cout << "Smth else" << std::endl;
       }
     };
 

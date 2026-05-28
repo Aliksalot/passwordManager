@@ -192,8 +192,9 @@ namespace core{
     if(lines.size() == 0)
       throw std::runtime_error("On load: file possibly corrupted");
 
+    auto newCipher = utils::Serializer::deserializeCipher(lines[0]);
     delete defaultCipher;
-    defaultCipher = utils::Serializer::deserializeCipher(lines[0]);
+    defaultCipher = newCipher;
     lines.remove(0);
     passwords = utils::Serializer::deserializePasswords(lines);
   }

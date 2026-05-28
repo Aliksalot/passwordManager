@@ -65,6 +65,7 @@ namespace utils {
       clib::List<clib::String> words = raw.split(' ');
       if(words.size() == 0)
         throw utils::InvalidCipherTypeException("File possibly corrupted");
+
       encrypt::CipherType type = encrypt::stringToCipherType(words[0]);
       clib::List<clib::String> args;
       for(std::size_t i = 1; i < words.size(); i ++) {

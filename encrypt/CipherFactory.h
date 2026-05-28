@@ -3,10 +3,9 @@
 #include"../utils/array.h"
 #include"../utils/string.h"
 #include"../utils/exceptions.h"
-#include"./CipherConfig.h"
 
-#include"./TestCypher.h"
-#include"./CaesarCipher.h"
+#include"./ciphers/TestCypher.h"
+#include"./ciphers/CaesarCipher.h"
 
 namespace encrypt {
 

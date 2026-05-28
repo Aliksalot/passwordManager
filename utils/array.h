@@ -13,7 +13,7 @@ namespace clib {
       List(const T* arr, std::size_t len);
       ~List();
 
-      void add(const T& item);
+      List& add(const T& item);
 
       List(const List& l);
       List& operator=(const List& l);
@@ -26,6 +26,7 @@ namespace clib {
       void extend(const List<T>& list);
       void clear();
       List& remove(std::size_t st, std::size_t items = 1);
+      List& insert(std::size_t at, const T& item);
       T pop();
       bool contains(const T& item) const;
       std::size_t size() const;
@@ -128,11 +129,13 @@ namespace clib {
   }
 
   template<typename T>
-  void List<T>::add(const T& item) {
+  List<T>& List<T>::add(const T& item) {
     if(full()) expand();
 
     new (data + count) T(item);
     count ++; 
+
+    return *this;
   }
 
   //TODO Try/catch and implement rollback
@@ -186,6 +189,24 @@ namespace clib {
     }
 
     clear_data(count - items);
+    return *this;
+  }
+
+  template<typename T>
+  List<T>& List<T>::insert(std::size_t at, const T& item) { 
+    if(at == count) return add(item);
+
+    if(!indexInBounds(at)) throw std::out_of_range("insert: index out of bounds");
+
+    if(full()) expand();
+    
+    for(std::size_t i = count; i > at; i --) {
+      data[i] = std::move(data[i-1]);
+    }
+    
+    new (data + at) T(item);
+    count ++;
+
     return *this;
   }
 

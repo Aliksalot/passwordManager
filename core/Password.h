@@ -4,7 +4,8 @@
 #include"../encrypt/Cypher.h"
 #include"../encrypt/CipherTypeUtils.h"
 
-namespace core { class PasswordEntry {
+namespace core { 
+  class PasswordEntry {
     public:
       PasswordEntry();
       ~PasswordEntry();
