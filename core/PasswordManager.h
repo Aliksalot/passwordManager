@@ -23,7 +23,7 @@ namespace core{
       );
 
       f.add("google.com", "u1", "password1", new encrypt::TestCipher("Hello"));
-      f.add("google.com", "u2", "password2", new encrypt::TextCode("./encryption"));
+      f.add("google.com", "u2", "password2", new encrypt::TextCode("./data/encryption"));
       f.add("google.com", "u3", "password3");
 
       f.save("password");
@@ -46,6 +46,6 @@ namespace core{
     };
 
   private:
-    core::PasswordFile f = core::PasswordFile(clib::String("./test1"));
+    core::PasswordFile f = core::PasswordFile(clib::String("./data/test1"));
   };
 }
