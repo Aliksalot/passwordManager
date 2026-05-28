@@ -1,6 +1,6 @@
 #pragma once
 #include"../utils/string.h"
-#include"./CipherTypes.h"
+#include"./CipherTypeUtils.h"
 
 namespace encrypt {
   class Cypher {

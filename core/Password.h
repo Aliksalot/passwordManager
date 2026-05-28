@@ -2,9 +2,9 @@
 
 #include"../utils/string.h"
 #include"../encrypt/Cypher.h"
+#include"../encrypt/CipherTypeUtils.h"
 
-namespace core {
-  class PasswordEntry {
+namespace core { class PasswordEntry {
     public:
       PasswordEntry();
       ~PasswordEntry();
@@ -27,6 +27,7 @@ namespace core {
       void setPassword(const clib::String& passwordEncrypted);
       clib::String getPasswordEncrypted() const;
       const encrypt::Cypher* getCipher() const;
+      clib::String serialize() const;
 
     private:
       clib::String website;
@@ -114,4 +115,10 @@ namespace core {
   bool PasswordEntry::operator==(const PasswordEntry& p) const {
     return website == p.website && username == p.username;
   };
+
+  clib::String PasswordEntry::serialize() const {
+    return 
+      website + " " + username + " " + passwordEncrypted
+        + " " + cipherTypeToString(cipher->type()) + " " + cipher->serialize();
+  }
 }

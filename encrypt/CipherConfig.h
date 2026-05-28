@@ -1,7 +1,7 @@
 #pragma once
 #include"../utils/string.h"
 #include"../utils/array.h"
-#include"./CipherTypes.h"
+#include"./CipherTypeUtils.h"
 
 namespace encrypt {
   struct CipherConfig {

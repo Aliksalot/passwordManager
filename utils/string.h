@@ -150,10 +150,6 @@ namespace clib{
       }
 
       temp += l[i];
-      for(std::size_t j = 0; j < temp.size(); j ++) {
-        std::cout << "\"" << temp[j] << "\" ";
-      }
-      std::cout << std::endl;
     }
     out.add(temp);
     return out;

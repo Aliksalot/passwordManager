@@ -17,6 +17,7 @@ namespace core{
     PasswordFile(clib::String path);
     ~PasswordFile();
 
+    const encrypt::Cypher* getDefaultCipher() const;
     clib::List<PasswordEntry> find(
       const clib::String& website = "",
       const clib::String& user = ""
@@ -56,6 +57,10 @@ namespace core{
   }
 
   inline PasswordFile::PasswordFile(clib::String path): path(path) {};
+
+  inline const encrypt::Cypher* PasswordFile::getDefaultCipher() const {
+    return defaultCipher;
+  }
 
   inline clib::List<PasswordEntry> PasswordFile::find(
       const clib::String& website,
@@ -142,8 +147,6 @@ namespace core{
 
     std::ofstream file(path.raw(), std::ios::binary);
 
-    std::cout << path.raw() << std::endl;
-
     if(!file)
       throw std::runtime_error("Error when opening file to create");
 
@@ -183,28 +186,15 @@ namespace core{
 
     content = utils::FileEncrypt::decrypt(content, password);
 
-    std::cout << content;
-
     clib::List<clib::String> lines = content.split('\n');
 
-    std::cout << "LINES WE HAVE: " << std::endl;
-    for(std::size_t i = 0; i < lines.size(); i ++) {
-      std::cout << lines[i] << std::endl;
-    }
-    std::cout << std::endl;
 
     if(lines.size() == 0)
       throw std::runtime_error("On load: file possibly corrupted");
 
     delete defaultCipher;
     defaultCipher = utils::Serializer::deserializeCipher(lines[0]);
-    //std::cout << "CIPHER OK " << utils::Serializer::cipherTypeToString(defaultCipher->type()) << std::endl;
     lines.remove(0);
-    std::cout << "LINES WE HAVE AFTER REMOVE: " << std::endl;
-    for(std::size_t i = 0; i < lines.size(); i ++) {
-      std::cout << lines[i] << std::endl;
-    }
-    std::cout << std::endl;
     passwords = utils::Serializer::deserializePasswords(lines);
   }
 }
