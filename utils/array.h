@@ -182,7 +182,7 @@ namespace clib {
     if(st >= count || items == 0 || items > count - st) return *this;
     
     for(std::size_t i = st; i < count - items; i ++) {
-      data[i] = std::move(data[items]);
+      data[i] = std::move(data[items + i]);
     }
 
     clear_data(count - items);

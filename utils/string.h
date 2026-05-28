@@ -73,9 +73,14 @@ namespace clib{
     return l[index];
   }
   inline String& String::operator+=(const String& s) {
+    if(this == &s) {
+      String copy = s;
+      l.pop();
+      l.extend(copy.l);
+      return *this;
+    }
     l.pop();
     l.extend(s.l);
-    l.add('\0');
     return *this;
   }
   inline String& String::operator+=(char c) {
@@ -145,6 +150,10 @@ namespace clib{
       }
 
       temp += l[i];
+      for(std::size_t j = 0; j < temp.size(); j ++) {
+        std::cout << "\"" << temp[j] << "\" ";
+      }
+      std::cout << std::endl;
     }
     out.add(temp);
     return out;
@@ -169,7 +178,7 @@ namespace clib{
   }
 
   inline const char* String::raw() const{
-    return &l[0];
+    return l.size() ? &l[0] : "";
   }
   
 

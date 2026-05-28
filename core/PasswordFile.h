@@ -6,7 +6,7 @@
 #include"./Password.h"
 #include"../utils/array.h"
 #include"../encrypt/Cypher.h"
-#include"../encrypt/CipherConfig.h"
+#include"../utils/FileEncrypt.h"
 #include"../utils/Serializer.h"
 
 namespace core{
@@ -22,27 +22,37 @@ namespace core{
       const clib::String& user = ""
     );
     PasswordFile& remove(const clib::String& website, const clib::String& user = "");
-    PasswordFile& update(const PasswordEntry& p);
+    PasswordFile& update(
+      const clib::String& website,
+      const clib::String& username,
+      const clib::String& password
+    );
+    PasswordFile& add(
+      const clib::String& website,
+      const clib::String& username,
+      const clib::String& password,
+      encrypt::Cypher* cipher = nullptr
+    );
 
     //disable copy
     PasswordFile(const PasswordFile&) = delete;
     PasswordFile& operator=(const PasswordFile&) = delete;
 
-    void createFile(const encrypt::CipherConfig& config);
-    void load(const clib::String& filePassword);
-    void save();
+    void createFile(encrypt::Cypher* cipher, const clib::String& password);
+    void load(const clib::String& password);
+    void save(const clib::String& password);
 
     bool hasUnsavedData() const;
   private:
     clib::List<PasswordEntry> passwords;
     clib::String path;
-    encrypt::Cypher* cipher = nullptr;
+    encrypt::Cypher* defaultCipher = nullptr;
 
     bool hasUnsaved = false;
   };
 
   inline PasswordFile::~PasswordFile() {
-    delete cipher;
+    delete defaultCipher;
   }
 
   inline PasswordFile::PasswordFile(clib::String path): path(path) {};
@@ -77,73 +87,124 @@ namespace core{
   };
 
 
-  //TODO Not a good implementation
-  inline PasswordFile& PasswordFile::update(const PasswordEntry& p) {
-    if(long i = passwords.indexOf(p) >= 0) {
-      passwords[i] = p;
-    }else {
-      passwords.add(p);
+  inline PasswordFile& PasswordFile::add(
+    const clib::String& website,
+    const clib::String& username,
+    const clib::String& password,
+    encrypt::Cypher* cipher
+  ) {
+    if(defaultCipher == nullptr)
+      throw new std::runtime_error(
+        "Error when creatign new user - PasswordFile missing defaultCipher (Not initialized)"
+      );
+
+    for(std::size_t i = 0; i < passwords.size(); i ++) {
+      PasswordEntry& p = passwords[i];
+      if(p.getWebsite() == website && p.getUsername() == username)
+        throw new std::runtime_error(
+          "Error when creating new user - Person with such credentials already exists!"
+        );
     }
 
+    auto passCipher = cipher == nullptr ? defaultCipher : cipher;
+
+    passwords.add(PasswordEntry(
+      website, username,
+      passCipher->encrypt(password),
+      passCipher->clone()
+    ));
+
+    return *this;
+  }
+  inline PasswordFile& PasswordFile::update(
+    const clib::String& website,
+    const clib::String& username,
+    const clib::String& password
+  ) {
+    for(std::size_t i = 0; i < passwords.size(); i ++) {
+      PasswordEntry& p = passwords[i];
+      if(p.getWebsite() == website && p.getUsername() == username) {
+        p.setPassword(
+          p.getCipher()->encrypt(password)
+        );
+      }
+    }
     return *this;
   };
 
   inline void PasswordFile::createFile(
-    const encrypt::CipherConfig& config
+    encrypt::Cypher* cipher,
+    const clib::String& password
   ) {
 
-    if(config.password.empty())
-      throw std::runtime_error("Files must be password protected!");
+    delete defaultCipher;
+    defaultCipher = cipher;
 
-    std::cout << config.password << " " << config.password.empty() << "\n";
-    std::cout << utils::Serializer::cipherTypeToString(config.type) << "\n";
-
-    auto newCipher = encrypt::CipherFactory::create(config);
-
-    delete cipher;
-    cipher = newCipher;
-
-    std::ofstream file("./test");
+    std::ofstream file(path.raw(), std::ios::binary);
 
     std::cout << path.raw() << std::endl;
 
     if(!file)
       throw std::runtime_error("Error when opening file to create");
 
-    std::cout << "Created file!" << std::endl;
+    save(password);
   }
 
-  inline void PasswordFile::save() {
+  inline void PasswordFile::save(const clib::String& password) {
 
-    if(!cipher)
+    if(!defaultCipher)
       throw std::runtime_error("PasswordFile isn't intialized! ");
 
-    std::ofstream file(path.raw());
+    std::ofstream file(path.raw(), std::ios::binary);
 
     if(!file)
       throw std::runtime_error("Error when opening file to save");
 
-    file << utils::Serializer::serializeHeader(cipher);
-    file << "\n";
+    clib::String content;
 
-    clib::String encryptedPasswords = cipher->encrypt(
-      utils::Serializer::serializePasswords(passwords)
-    );
+    content += utils::Serializer::serializeCipher(defaultCipher) + "\n";
+    content += utils::Serializer::serializePasswords(passwords);
 
-    file << encryptedPasswords;
+    clib::String encryptedPasswords = utils::FileEncrypt::encrypt(content, password);
+    file.write(encryptedPasswords.raw(), encryptedPasswords.size());
 
     hasUnsaved = false;
   }
-  inline void PasswordFile::load(const clib::String& filePassword) {
-    //ima li cypher?
-    if(cipher) {
-      //veche sme go cheli
 
-    }else {
-      //za sefte go vijdame
-      encrypt::CipherConfig conf = utils::Serializer::deserializeHeader("");
-      cipher = encrypt::CipherFactory::create(encrypt::CipherConfig(conf, filePassword));
+  inline void PasswordFile::load(const clib::String& password) {
+    std::ifstream file(path.raw(), std::ios::binary);
+
+    clib::String content;
+    char c;
+
+    while(file.get(c)) {
+        content += c;
     }
-  }
 
+    content = utils::FileEncrypt::decrypt(content, password);
+
+    std::cout << content;
+
+    clib::List<clib::String> lines = content.split('\n');
+
+    std::cout << "LINES WE HAVE: " << std::endl;
+    for(std::size_t i = 0; i < lines.size(); i ++) {
+      std::cout << lines[i] << std::endl;
+    }
+    std::cout << std::endl;
+
+    if(lines.size() == 0)
+      throw std::runtime_error("On load: file possibly corrupted");
+
+    delete defaultCipher;
+    defaultCipher = utils::Serializer::deserializeCipher(lines[0]);
+    //std::cout << "CIPHER OK " << utils::Serializer::cipherTypeToString(defaultCipher->type()) << std::endl;
+    lines.remove(0);
+    std::cout << "LINES WE HAVE AFTER REMOVE: " << std::endl;
+    for(std::size_t i = 0; i < lines.size(); i ++) {
+      std::cout << lines[i] << std::endl;
+    }
+    std::cout << std::endl;
+    passwords = utils::Serializer::deserializePasswords(lines);
+  }
 }

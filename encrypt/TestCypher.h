@@ -23,7 +23,7 @@ namespace encrypt {
   }
 
   clib::String TestCypher::serialize() const {
-    return "";
+    return secretword;
   }
 
   clib::String TestCypher::encrypt(const clib::String& text) const{

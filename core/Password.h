@@ -22,8 +22,12 @@ namespace core {
       bool operator==(const PasswordEntry& p) const;
       clib::String getWebsite() const;
       clib::String getUsername() const;
+      void setUsername(const clib::String& username);
+      void setWebsite(const clib::String& website);
+      void setPassword(const clib::String& passwordEncrypted);
       clib::String getPasswordEncrypted() const;
       const encrypt::Cypher* getCipher() const;
+
     private:
       clib::String website;
       clib::String username;
@@ -47,6 +51,15 @@ namespace core {
   }
   clib::String PasswordEntry::getUsername() const {
     return username;
+  }
+  void PasswordEntry::setUsername(const clib::String& username) {
+    this->username = username;
+  }
+  void PasswordEntry::setWebsite(const clib::String& website) {
+    this->website = website;
+  }
+  void PasswordEntry::setPassword(const clib::String& passwordEncrypted) {
+    this->passwordEncrypted = passwordEncrypted;
   }
   clib::String PasswordEntry::getPasswordEncrypted() const {
     return passwordEncrypted;

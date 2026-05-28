@@ -13,20 +13,15 @@ namespace encrypt {
   class CipherFactory {
   public:
     static Cypher* create(
-        CipherConfig conf
+        CipherType type,
+        const clib::List<clib::String>& args
     ) {
-      switch(conf.type) {
+      switch(type) {
         case CipherType::TestCipher: {
-          if(conf.password != "") {
-            return new TestCypher(TestCypher::fromPassword(conf.password)); 
-          }
-          return new TestCypher(conf.args[0]); 
+          return new TestCypher(args[0]); 
         }
         case CipherType::CaesarCipher: {
-          if(conf.password != "") {
-            return new CaesarCipher(CaesarCipher::fromPassword(conf.password)); 
-          }
-          return new CaesarCipher(conf.args[0].toInt());
+          return new CaesarCipher(args[0].toInt());
         }
         default: throw utils::InvalidCipherTypeException();
       }

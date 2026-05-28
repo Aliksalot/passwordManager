@@ -11,7 +11,6 @@ namespace encrypt {
     CaesarCipher* clone() const override;
     CipherType type() const override;
     clib::String serialize() const override;
-    static unsigned fromPassword(const clib::String& password);
   private:
     const unsigned key;
   };
@@ -34,11 +33,6 @@ namespace encrypt {
   };
   CaesarCipher* CaesarCipher::clone() const {
     return new CaesarCipher(key);
-  }
-
-  unsigned CaesarCipher::fromPassword(const clib::String& password) {
-    //TODO
-    return 0;
   }
   
 }
