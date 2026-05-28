@@ -5,22 +5,26 @@
 namespace encrypt{
   enum class CipherType {
     TestCipher,
-    CaesarCipher
+    CaesarCipher,
+    TextCode
   };
   inline clib::String cipherTypeToString (encrypt::CipherType t) {
     switch(t) {
-      case encrypt::CipherType::TestCipher: return clib::String("test_cypher");
-      case encrypt::CipherType::CaesarCipher: return clib::String("caesar_cypher");
+      case CipherType::TestCipher: return clib::String("test_cypher");
+      case CipherType::CaesarCipher: return clib::String("caesar_cypher");
+      case CipherType::TextCode: return clib::String("text_code");
       default: 
-        throw utils::InvalidCipherTypeException();
+        throw utils::InvalidCipherTypeError();
     }
   }
-  inline encrypt::CipherType stringToCipherType (const clib::String& s) {
-    if(s == cipherTypeToString(encrypt::CipherType::TestCipher))
-      return encrypt::CipherType::TestCipher;
-    if(s == cipherTypeToString(encrypt::CipherType::CaesarCipher))
-      return encrypt::CipherType::CaesarCipher;
+  inline CipherType stringToCipherType (const clib::String& s) {
+    if(s == cipherTypeToString(CipherType::TestCipher))
+      return CipherType::TestCipher;
+    if(s == cipherTypeToString(CipherType::CaesarCipher))
+      return CipherType::CaesarCipher;
+    if(s == cipherTypeToString(CipherType::TextCode))
+      return CipherType::TextCode;
 
-    throw utils::InvalidCipherTypeException("INVALID CIPHER");
+    throw utils::InvalidCipherTypeError(clib::String("Invalid cipher: ") +s);
   }
 }

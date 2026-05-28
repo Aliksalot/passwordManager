@@ -5,7 +5,8 @@
 #include"./PasswordFile.h"
 #include"./Password.h"
 #include"../encrypt/CipherTypeUtils.h"
-#include"../encrypt/ciphers/TestCypher.h"
+#include"../encrypt/ciphers/TestCipher.h"
+#include"../encrypt/ciphers/TextCode.h"
 #include"../encrypt/ciphers/CaesarCipher.h"
 #include<iostream>
 
@@ -15,32 +16,36 @@ namespace core{
 
   public:
     PasswordManager() {
+
       f.createFile(
         new encrypt::CaesarCipher(22),
         "password"
       );
 
-      f.add("google.com", "u1", "password1");
-      f.add("google.com", "u2", "password2");
+      f.add("google.com", "u1", "password1", new encrypt::TestCipher("Hello"));
+      f.add("google.com", "u2", "password2", new encrypt::TextCode("./encryption"));
+      f.add("google.com", "u3", "password3");
 
       f.save("password");
 
       try{
-        f.load("kur");
+        f.load("password");
         std::cout << encrypt::cipherTypeToString(f.getDefaultCipher()->type()) << " " << f.getDefaultCipher()->serialize() << std::endl;
         auto pws = f.find();
-        for(auto i = 0; i < pws.size(); i ++) {
-          std::cout << pws[i].serialize() << std::endl;
-          std::cout << "Decrypted: " << pws[i].getCipher()->decrypt(pws[i].getPasswordEncrypted()) << std::endl;
+        for(auto& p: pws) {
+          std::cout << p.serialize() << std::endl;
+          std::cout << "Decrypted: " << p.getCipher()->decrypt(p.getPasswordEncrypted()) << std::endl;
         }
-      }catch(const utils::InvalidCipherTypeException& e) {
+      }catch(const utils::EncryptionError& e) {
+        std::cout << e.what() << std::endl;
+      }catch(const utils::FileError& e) {
         std::cout << e.what() << std::endl;
       }catch(...) {
-        std::cout << "Smth else" << std::endl;
+        std::cout << "Some unknown error happened" << std::endl;
       }
     };
 
   private:
-    core::PasswordFile f = core::PasswordFile(clib::String("./test"));
+    core::PasswordFile f = core::PasswordFile(clib::String("./test1"));
   };
 }

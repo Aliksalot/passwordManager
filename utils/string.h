@@ -188,6 +188,7 @@ namespace clib{
     }
     return stream;
   }
+
   inline std::istream& operator>>(std::istream& stream, String& s) {
     s.clear();
 

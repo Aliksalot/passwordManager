@@ -1,7 +1,7 @@
 #pragma once
 
 #include"../utils/string.h"
-#include"../encrypt/Cypher.h"
+#include"../encrypt/Cipher.h"
 #include"../encrypt/CipherTypeUtils.h"
 
 namespace core { 
@@ -13,7 +13,7 @@ namespace core {
           const clib::String& website,
           const clib::String& username,
           const clib::String& passwordEncrypted,
-          encrypt::Cypher* cipher
+          encrypt::Cipher* cipher
       );
       PasswordEntry(const PasswordEntry& p);
       PasswordEntry(PasswordEntry&& p);
@@ -27,15 +27,17 @@ namespace core {
       void setWebsite(const clib::String& website);
       void setPassword(const clib::String& passwordEncrypted);
       clib::String getPasswordEncrypted() const;
-      const encrypt::Cypher* getCipher() const;
+      const encrypt::Cipher* getCipher() const;
       clib::String serialize() const;
 
     private:
       clib::String website;
       clib::String username;
       clib::String passwordEncrypted;
-      encrypt::Cypher* cipher;
+      encrypt::Cipher* cipher;
   };
+
+  PasswordEntry::PasswordEntry(): cipher(nullptr) {};
 
   PasswordEntry::~PasswordEntry() {
     delete cipher;
@@ -45,7 +47,7 @@ namespace core {
       const clib::String& website,
       const clib::String& username,
       const clib::String& passwordEncrypted,
-      encrypt::Cypher* cipher
+      encrypt::Cipher* cipher
   ): website(website),username(username), passwordEncrypted(passwordEncrypted),cipher(cipher) {};
 
   clib::String PasswordEntry::getWebsite() const {
@@ -66,7 +68,7 @@ namespace core {
   clib::String PasswordEntry::getPasswordEncrypted() const {
     return passwordEncrypted;
   }
-  const encrypt::Cypher* PasswordEntry::getCipher() const {
+  const encrypt::Cipher* PasswordEntry::getCipher() const {
     return cipher;
   }
   
@@ -119,7 +121,7 @@ namespace core {
 
   clib::String PasswordEntry::serialize() const {
     return 
-      website + " " + username + " " + passwordEncrypted
-        + " " + cipherTypeToString(cipher->type()) + " " + cipher->serialize();
+      website + "\t" + username + "\t" + passwordEncrypted
+        + "\t" + cipherTypeToString(cipher->type()) + "\t" + cipher->serialize();
   }
 }

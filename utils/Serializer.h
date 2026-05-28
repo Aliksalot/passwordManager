@@ -3,7 +3,7 @@
 #include"../core/PasswordFile.h"
 #include"../core/Password.h"
 #include"../encrypt/CipherTypeUtils.h"
-#include"../encrypt/Cypher.h"
+#include"../encrypt/Cipher.h"
 #include"../encrypt/CipherFactory.h"
 #include"../utils/exceptions.h"
 #include<stdexcept>
@@ -24,7 +24,7 @@ namespace utils {
 
         if(lines[i].empty()) continue;
 
-        auto line = lines[i].split(' ');
+        auto line = lines[i].split('\t');
 
         if(line.empty()) continue;
 
@@ -57,14 +57,14 @@ namespace utils {
       }
       return result;
     }
-    static clib::String serializeCipher (const encrypt::Cypher* c) {
-      return encrypt::cipherTypeToString(c->type()) + " " + c->serialize();
+    static clib::String serializeCipher (const encrypt::Cipher* c) {
+      return encrypt::cipherTypeToString(c->type()) + "\t" + c->serialize();
     }
 
-    static encrypt::Cypher* deserializeCipher (const clib::String& raw) {
-      clib::List<clib::String> words = raw.split(' ');
+    static encrypt::Cipher* deserializeCipher (const clib::String& raw) {
+      clib::List<clib::String> words = raw.split('\t');
       if(words.size() == 0)
-        throw utils::InvalidCipherTypeException("File possibly corrupted");
+        throw utils::EncryptionError("File possibly corrupted");
 
       encrypt::CipherType type = encrypt::stringToCipherType(words[0]);
       clib::List<clib::String> args;

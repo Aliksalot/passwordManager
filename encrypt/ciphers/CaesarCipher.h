@@ -1,5 +1,5 @@
 #pragma once
-#include"../Cypher.h"
+#include"../Cipher.h"
 #include"../CipherTypeUtils.h"
 
 #define CAESAR_RANGE_ST 32
@@ -7,7 +7,7 @@
 #define CAESAR_ALPHABET_SIZE (CAESAR_RANGE_END - CAESAR_RANGE_ST + 1)
 
 namespace encrypt {
-  class CaesarCipher: public Cypher {
+  class CaesarCipher: public Cipher {
   public:
     CaesarCipher(unsigned step);
     clib::String encrypt(const clib::String& text) const override;

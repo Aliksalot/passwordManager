@@ -30,9 +30,11 @@ namespace clib {
       T pop();
       bool contains(const T& item) const;
       std::size_t size() const;
-      //TODO 
       long indexOf(const T& item) const;
       bool empty() const;
+      
+      T* begin();
+      T* end();
 
     private:
       T* data = nullptr;
@@ -290,5 +292,14 @@ namespace clib {
   bool List<T>::empty() const {
     return count == 0;
   }
+  template<typename T>
+  T* List<T>::begin() {
+    return data;
+  }
+  template<typename T>
+  T* List<T>::end() {
+    return data + count;
+  }
+
 }
 

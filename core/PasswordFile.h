@@ -5,7 +5,7 @@
 
 #include"./Password.h"
 #include"../utils/array.h"
-#include"../encrypt/Cypher.h"
+#include"../encrypt/Cipher.h"
 #include"../utils/FileEncrypt.h"
 #include"../utils/Serializer.h"
 
@@ -17,7 +17,7 @@ namespace core{
     PasswordFile(clib::String path);
     ~PasswordFile();
 
-    const encrypt::Cypher* getDefaultCipher() const;
+    const encrypt::Cipher* getDefaultCipher() const;
     clib::List<PasswordEntry> find(
       const clib::String& website = "",
       const clib::String& user = ""
@@ -32,14 +32,14 @@ namespace core{
       const clib::String& website,
       const clib::String& username,
       const clib::String& password,
-      encrypt::Cypher* cipher = nullptr
+      encrypt::Cipher* cipher = nullptr
     );
 
     //disable copy
     PasswordFile(const PasswordFile&) = delete;
     PasswordFile& operator=(const PasswordFile&) = delete;
 
-    void createFile(encrypt::Cypher* cipher, const clib::String& password);
+    void createFile(encrypt::Cipher* cipher, const clib::String& password);
     void load(const clib::String& password);
     void save(const clib::String& password);
 
@@ -47,7 +47,7 @@ namespace core{
   private:
     clib::List<PasswordEntry> passwords;
     clib::String path;
-    encrypt::Cypher* defaultCipher = nullptr;
+    encrypt::Cipher* defaultCipher = nullptr;
 
     bool hasUnsaved = false;
   };
@@ -58,7 +58,7 @@ namespace core{
 
   inline PasswordFile::PasswordFile(clib::String path): path(path) {};
 
-  inline const encrypt::Cypher* PasswordFile::getDefaultCipher() const {
+  inline const encrypt::Cipher* PasswordFile::getDefaultCipher() const {
     return defaultCipher;
   }
 
@@ -96,11 +96,11 @@ namespace core{
     const clib::String& website,
     const clib::String& username,
     const clib::String& password,
-    encrypt::Cypher* cipher
+    encrypt::Cipher* cipher
   ) {
     if(defaultCipher == nullptr)
       throw new std::runtime_error(
-        "Error when creatign new user - PasswordFile missing defaultCipher (Not initialized)"
+        "Error when creating new user - PasswordFile missing defaultCipher (Not initialized)"
       );
 
     for(std::size_t i = 0; i < passwords.size(); i ++) {
@@ -111,12 +111,12 @@ namespace core{
         );
     }
 
-    auto passCipher = cipher == nullptr ? defaultCipher : cipher;
+    auto passCipher = cipher == nullptr ? defaultCipher->clone() : cipher;
 
     passwords.add(PasswordEntry(
       website, username,
       passCipher->encrypt(password),
-      passCipher->clone()
+      passCipher
     ));
 
     return *this;
@@ -138,7 +138,7 @@ namespace core{
   };
 
   inline void PasswordFile::createFile(
-    encrypt::Cypher* cipher,
+    encrypt::Cipher* cipher,
     const clib::String& password
   ) {
 
@@ -148,7 +148,7 @@ namespace core{
     std::ofstream file(path.raw(), std::ios::binary);
 
     if(!file)
-      throw std::runtime_error("Error when opening file to create");
+      throw utils::FileError("Error when opening file to create");
 
     save(password);
   }
@@ -156,12 +156,13 @@ namespace core{
   inline void PasswordFile::save(const clib::String& password) {
 
     if(!defaultCipher)
-      throw std::runtime_error("PasswordFile isn't intialized! ");
+      throw std::runtime_error("Error when saving file - defaultCipher is missing \
+          (PasswordFile not initialized)");
 
     std::ofstream file(path.raw(), std::ios::binary);
 
     if(!file)
-      throw std::runtime_error("Error when opening file to save");
+      throw utils::FileError("Error when opening file for saving. Possibly missing");
 
     clib::String content;
 
@@ -177,6 +178,9 @@ namespace core{
   inline void PasswordFile::load(const clib::String& password) {
     std::ifstream file(path.raw(), std::ios::binary);
 
+    if(!file)
+      throw utils::FileError("Possibly missing file");
+
     clib::String content;
     char c;
 
@@ -188,9 +192,12 @@ namespace core{
 
     clib::List<clib::String> lines = content.split('\n');
 
+    for(auto& line: lines) {
+      std::cout << line << std::endl;
+    }
 
     if(lines.size() == 0)
-      throw std::runtime_error("On load: file possibly corrupted");
+      throw utils::EncryptionError();
 
     auto newCipher = utils::Serializer::deserializeCipher(lines[0]);
     delete defaultCipher;
