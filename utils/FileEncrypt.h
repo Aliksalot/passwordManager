@@ -8,7 +8,6 @@ namespace utils {
     static clib::String encrypt(const clib::String& raw, const clib::String& password);
 
     static clib::String decrypt(const clib::String& raw, const clib::String& password);
-
   };
 
   inline clib::String FileEncrypt::encrypt(const clib::String& raw, const clib::String& password)  {

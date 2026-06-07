@@ -2,7 +2,7 @@
 
 #include"../utils/array.h"
 #include<iostream>
-#include"./Z26.h"
+#include"./RemRing.h"
 
 namespace math {
 

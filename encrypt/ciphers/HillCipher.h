@@ -3,7 +3,7 @@
 #include"../Cipher.h"
 #include"../CipherTypeUtils.h"
 #include"../../math/SqMatrix.h"
-#include"../../math/Z26.h"
+#include"../../math/RemRing.h"
 
 namespace encrypt {
 
@@ -22,6 +22,8 @@ namespace encrypt {
      HillCipher() = delete;
      HillCipher(math::SqMatrix m);
 
+     static clib::List<math::Z26> toZ26(const clib::String& text);
+     static clib::String fromZ26(const clib::List<math::Z26> tokens);
   };
 
   inline HillCipher::HillCipher(math::SqMatrix m): m(m) { };
@@ -39,11 +41,30 @@ namespace encrypt {
   }
 
   inline clib::String HillCipher::encrypt(const clib::String& text) const {
-    return math::Z26::fromZ26(m.apply(math::Z26::toZ26(text)));
+    return fromZ26(m.apply(toZ26(text)));
   }
 
   inline clib::String HillCipher::decrypt(const clib::String& text) const {
-    return math::Z26::fromZ26(m.applyInverse(math::Z26::toZ26(text)));
+    return fromZ26(m.applyInverse(toZ26(text)));
+  }
+
+  inline clib::List<math::Z26> HillCipher::toZ26(const clib::String& text) {
+    clib::List<math::Z26> res;
+    for(std::size_t i = 0; i < text.size(); i ++) {
+      char c = text[i];
+      if(c < 'a' || c > 'z')
+        throw std::runtime_error("HillCipher alphabet consists of only a-z lowercase!");
+      res.add(math::Z26(signed(c - 'a')));
+    }
+    return res;
+  }
+
+  inline clib::String HillCipher::fromZ26(const clib::List<math::Z26> tokens) {
+    clib::String res;
+    for(auto& code: tokens) {
+      res += char(code.raw() + 'a');
+    }
+    return res;
   }
 
 }
