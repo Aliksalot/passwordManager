@@ -18,10 +18,10 @@ namespace core{
     ~PasswordFile();
 
     const encrypt::Cipher* getDefaultCipher() const;
-    clib::List<PasswordEntry> find(
+    clib::List<const PasswordEntry*> find(
       const clib::String& website = "",
       const clib::String& user = ""
-    );
+    ) const;
     PasswordFile& remove(const clib::String& website, const clib::String& user = "");
     PasswordFile& update(
       const clib::String& website,
@@ -38,6 +38,10 @@ namespace core{
     //disable copy
     PasswordFile(const PasswordFile&) = delete;
     PasswordFile& operator=(const PasswordFile&) = delete;
+
+    //disable move
+    PasswordFile(PasswordFile&&) = delete;
+    PasswordFile& operator=(PasswordFile&&) = delete;
 
     void createFile(encrypt::Cipher* cipher, const clib::String& password);
     void load(const clib::String& password);

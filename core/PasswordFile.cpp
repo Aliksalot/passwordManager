@@ -11,15 +11,16 @@ namespace core {
     return defaultCipher;
   }
 
-  clib::List<PasswordEntry> PasswordFile::find(
+  clib::List<const PasswordEntry*> PasswordFile::find(
       const clib::String& website,
       const clib::String& user
-  ) {
-    clib::List<PasswordEntry> r;
+  ) const {
+    clib::List<const PasswordEntry*> r;
     for(std::size_t i = 0; i < passwords.size(); i ++) {
       bool websiteMatch = website.empty() || website == passwords[i].getWebsite();
       bool userMatch = user.empty() || user == passwords[i].getUsername();
-      if(websiteMatch && userMatch) r.add(passwords[i]);
+      if(websiteMatch && userMatch) 
+        r.add(&passwords[i]);
     }
     return r;
   }
@@ -33,6 +34,7 @@ namespace core {
       bool userMatch = user.empty() || user == passwords[i].getUsername();
       if(websiteMatch && userMatch) {
         passwords.remove(i);
+        hasUnsaved = true;
       }else {
         i ++;
       }
@@ -48,14 +50,14 @@ namespace core {
     encrypt::Cipher* cipher
   ) {
     if(defaultCipher == nullptr)
-      throw std::runtime_error(
+      throw utils::PasswordModifyError(
         "Error when creating new user - PasswordFile missing defaultCipher (Not initialized)"
       );
 
     for(std::size_t i = 0; i < passwords.size(); i ++) {
       PasswordEntry& p = passwords[i];
       if(p.getWebsite() == website && p.getUsername() == username)
-        throw std::runtime_error(
+        throw utils::PasswordModifyError(
           "Error when creating new user - Person with such credentials already exists!"
         );
     }
@@ -68,6 +70,8 @@ namespace core {
       passCipher
     ));
 
+    hasUnsaved = true;
+
     return *this;
   }
   PasswordFile& PasswordFile::update(
@@ -75,13 +79,25 @@ namespace core {
     const clib::String& username,
     const clib::String& password
   ) {
+
+    bool foundMatch = false;
     for(std::size_t i = 0; i < passwords.size(); i ++) {
       PasswordEntry& p = passwords[i];
       if(p.getWebsite() == website && p.getUsername() == username) {
+        if(
+          p.getCipher()->decrypt(p.getPasswordEncrypted()) == password
+        ) {
+          throw utils::PasswordModifyError("Error when updating password - New password matches old one!");
+        }
         p.setPassword(
           p.getCipher()->encrypt(password)
         );
+        hasUnsaved = true;
+        foundMatch = true;
       }
+    }
+    if(!foundMatch) {
+      throw utils::PasswordModifyError("Error when updating password - Couldn't find a password entry to update!");
     }
     return *this;
   };
@@ -105,7 +121,7 @@ namespace core {
   void PasswordFile::save(const clib::String& password) {
 
     if(!defaultCipher)
-      throw std::runtime_error("Error when saving file - defaultCipher is missing \
+      throw utils::FileError("Error when saving file - defaultCipher is missing \
           (PasswordFile not initialized)");
 
     std::ofstream file(path.raw(), std::ios::binary);
@@ -153,5 +169,9 @@ namespace core {
     defaultCipher = newCipher;
     lines.remove(0);
     passwords = utils::Serializer::deserializePasswords(lines);
+  }
+
+  bool PasswordFile::hasUnsavedData() const {
+    return hasUnsaved;
   }
 }

@@ -14,12 +14,6 @@ namespace core {
       encrypt::Cipher* cipher
   ): website(website),username(username), passwordEncrypted(passwordEncrypted),cipher(cipher) {};
 
-  clib::String PasswordEntry::getWebsite() const {
-    return website;
-  }
-  clib::String PasswordEntry::getUsername() const {
-    return username;
-  }
   void PasswordEntry::setUsername(const clib::String& username) {
     this->username = username;
   }

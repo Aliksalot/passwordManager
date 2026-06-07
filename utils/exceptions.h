@@ -24,8 +24,21 @@ namespace utils {
 
   class InvalidCipherTypeError : public EncryptionError {
   public:
-      InvalidCipherTypeError(): EncryptionError("Invalid CipherType") {}
-      InvalidCipherTypeError(const char* s): EncryptionError(s) {}
-      InvalidCipherTypeError(const clib::String& s): EncryptionError(s.raw()) {}
+    InvalidCipherTypeError(): EncryptionError("Invalid CipherType") {}
+    InvalidCipherTypeError(const char* s): EncryptionError(s) {}
+    InvalidCipherTypeError(const clib::String& s): EncryptionError(s.raw()) {}
+  };
+  class NoFileOpenError : public std::runtime_error {
+  public:
+    NoFileOpenError(): std::runtime_error("No current password file. ") {}
+    NoFileOpenError(const char* s): std::runtime_error(s) {}
+    NoFileOpenError(const clib::String& s): std::runtime_error(s.raw()) {}
+  };
+  class PasswordModifyError : public std::runtime_error {
+  public:
+    PasswordModifyError(): std::runtime_error("You did something wrong, but we \
+        are unsure what it is") {}
+    PasswordModifyError(const char* s): std::runtime_error(s) {}
+    PasswordModifyError(const clib::String& s): std::runtime_error(s.raw()) {}
   };
 }
