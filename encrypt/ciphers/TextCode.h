@@ -46,7 +46,7 @@ namespace encrypt {
     
     clib::String cipherText = readCipherFile();
     for(std::size_t i = 0; i < cipherText.size(); i ++)
-      if(cm.data[cipherText[i]] < 0) cm.data[cipherText[i]] = i;
+      if(cm.data[unsigned(cipherText[i])] < 0) cm.data[unsigned(cipherText[i])] = i;
 
     return cm;
   }

@@ -7,6 +7,9 @@
 #include"./ciphers/TestCipher.h"
 #include"./ciphers/CaesarCipher.h"
 #include"./ciphers/TextCode.h"
+#include"./ciphers/HillCipher.h"
+
+#include"../math/SqMatrix.h"
 
 namespace encrypt {
 
@@ -25,6 +28,9 @@ namespace encrypt {
         }
         case CipherType::TextCode: {
           return new TextCode(args[0]);
+        }
+        case CipherType::HillCipher: {
+          return new HillCipher(math::SqMatrix::deserialize(args[0]));
         }
         default: throw utils::InvalidCipherTypeError();
       }

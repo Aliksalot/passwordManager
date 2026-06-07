@@ -36,6 +36,9 @@ namespace clib {
       T* begin();
       T* end();
 
+      const T* begin() const;
+      const T* end() const;
+
     private:
       T* data = nullptr;
       std::size_t count = 0;
@@ -300,6 +303,15 @@ namespace clib {
   T* List<T>::end() {
     return data + count;
   }
+  template<typename T>
+  const T* List<T>::begin() const {
+    return data;
+  }
+  template<typename T>
+  const T* List<T>::end() const {
+    return data + count;
+  }
+
 
 }
 

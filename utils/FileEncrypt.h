@@ -11,7 +11,7 @@ namespace utils {
 
   };
 
-  clib::String FileEncrypt::encrypt(const clib::String& raw, const clib::String& password)  {
+  inline clib::String FileEncrypt::encrypt(const clib::String& raw, const clib::String& password)  {
     clib::String out = raw;
 
     for(std::size_t i = 0; i < raw.size(); i ++) {
@@ -21,7 +21,7 @@ namespace utils {
 
     return out;
   }
-  clib::String FileEncrypt::decrypt(const clib::String& raw, const clib::String& password) {
+  inline clib::String FileEncrypt::decrypt(const clib::String& raw, const clib::String& password) {
     return encrypt(raw, password);
   }
 }
