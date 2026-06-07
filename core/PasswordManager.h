@@ -37,6 +37,7 @@ namespace core{
       f.add("google.com", "u2", "password2", new encrypt::TextCode("./data/encryption"));
       f.add("google.com", "u3", "password3", new encrypt::CaesarCipher(5));
       f.add("google.com", "u4", "password", new encrypt::HillCipher(m));
+      f.add("google.com", "u5", "ilovecoffee", new encrypt::VignereCipher("iwanttokissyourfeet"));
 
       f.save("password");
       try{

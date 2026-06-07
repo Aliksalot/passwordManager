@@ -7,7 +7,8 @@ namespace encrypt{
     TestCipher,
     CaesarCipher,
     TextCode,
-    HillCipher
+    HillCipher,
+    VignereCipher,
   };
   inline clib::String cipherTypeToString (encrypt::CipherType t) {
     switch(t) {
@@ -15,9 +16,10 @@ namespace encrypt{
       case CipherType::CaesarCipher: return clib::String("caesar_cipher");
       case CipherType::TextCode: return clib::String("text_code");
       case CipherType::HillCipher: return clib::String("hill_cipher");
-      default: 
-        throw utils::InvalidCipherTypeError();
+      case CipherType::VignereCipher: return clib::String("vignere_cipher");
     }
+
+    throw std::logic_error("unreachable");
   }
   inline CipherType stringToCipherType (const clib::String& s) {
     if(s == cipherTypeToString(CipherType::TestCipher))
@@ -28,6 +30,9 @@ namespace encrypt{
       return CipherType::TextCode;
     if(s == cipherTypeToString(CipherType::HillCipher))
       return CipherType::HillCipher;
+    if(s == cipherTypeToString(CipherType::VignereCipher))
+      return CipherType::VignereCipher;
+
     throw utils::InvalidCipherTypeError(clib::String("Invalid cipher: ") + s);
   }
 }

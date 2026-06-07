@@ -8,6 +8,7 @@
 #include"./ciphers/CaesarCipher.h"
 #include"./ciphers/TextCode.h"
 #include"./ciphers/HillCipher.h"
+#include"./ciphers/VignereCipher.h"
 
 #include"../math/SqMatrix.h"
 
@@ -32,8 +33,12 @@ namespace encrypt {
         case CipherType::HillCipher: {
           return new HillCipher(math::SqMatrix::deserialize(args[0]));
         }
-        default: throw utils::InvalidCipherTypeError();
+        case CipherType::VignereCipher: {
+          return new VignereCipher(args[0]);
+        }
       }
+
+      throw std::logic_error("unreachable");
     }
   };
 }

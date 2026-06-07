@@ -21,6 +21,8 @@ namespace math {
     int raw() const;
 
     Z26 inverse() const;
+     static clib::List<math::Z26> toZ26(const clib::String& text);
+     static clib::String fromZ26(const clib::List<math::Z26> tokens);
   };
 
   inline Z26::Z26() {
@@ -81,21 +83,43 @@ namespace math {
     return n == other.n;
   }
 
-  inline Z26 operator+(const Z26& l, const Z26& r) {
-    Z26 res = Z26(l);
-    res += r;
-    return res;
+  inline Z26 operator+(Z26 l, const Z26& r) {
+    l += r;
+    return l;
   }
 
-  inline Z26 operator*(const Z26& l, const Z26& r) {
-    Z26 res = Z26(l);
-    res *= r;
-    return res;
+  inline Z26 operator*(Z26 l, const Z26& r) {
+    l *= r;
+    return l;
   }
 
   inline Z26 operator-(const Z26& el) {
     Z26 res;
     res -= el;
+    return res;
+  }
+
+  inline Z26 operator-(Z26 l, const Z26& r) {
+    l -= r;
+    return l;
+  }
+
+  inline clib::List<math::Z26> Z26::toZ26(const clib::String& text) {
+    clib::List<math::Z26> res;
+    for(std::size_t i = 0; i < text.size(); i ++) {
+      char c = text[i];
+      if(c < 'a' || c > 'z')
+        throw std::runtime_error("HillCipher alphabet consists of only a-z lowercase!");
+      res.add(math::Z26(signed(c - 'a')));
+    }
+    return res;
+  }
+
+  inline clib::String Z26::fromZ26(const clib::List<math::Z26> tokens) {
+    clib::String res;
+    for(auto& code: tokens) {
+      res += char(code.raw() + 'a');
+    }
     return res;
   }
 
