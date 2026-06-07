@@ -2,9 +2,8 @@
 
 #include"../core/PasswordFile.h"
 #include"../core/Password.h"
-#include"../encrypt/CipherTypeUtils.h"
 #include"../encrypt/Cipher.h"
-#include"../encrypt/CipherFactory.h"
+#include"../encrypt/CipherRegistry.h"
 #include"../utils/exceptions.h"
 #include<stdexcept>
 
@@ -36,9 +35,8 @@ namespace utils {
           cipherArguments.add(line[j]);
         }
 
-        auto cipher = encrypt::CipherFactory::create(
-          encrypt::stringToCipherType(line[3]), cipherArguments
-        );
+        auto cipher = encrypt::CipherRegistry::get()
+          .byType(line[3])->fromArgs(cipherArguments);
 
         l.add(core::PasswordEntry(
           line[0], line[1], line[2],
@@ -58,7 +56,7 @@ namespace utils {
       return result;
     }
     static clib::String serializeCipher (const encrypt::Cipher* c) {
-      return encrypt::cipherTypeToString(c->type()) + "\t" + c->serialize();
+      return c->type() + "\t" + c->serialize();
     }
 
     static encrypt::Cipher* deserializeCipher (const clib::String& raw) {
@@ -66,12 +64,13 @@ namespace utils {
       if(words.size() == 0)
         throw utils::EncryptionError("File possibly corrupted");
 
-      encrypt::CipherType type = encrypt::stringToCipherType(words[0]);
+      clib::String type = words[0];
       clib::List<clib::String> args;
       for(std::size_t i = 1; i < words.size(); i ++) {
         args.add(words[i]);
       }
-      return encrypt::CipherFactory::create(type, args);
+      return encrypt::CipherRegistry::get()
+        .byType(type)->fromArgs(args);
     }
 
   };

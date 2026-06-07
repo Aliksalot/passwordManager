@@ -1,5 +1,6 @@
 #pragma once
 #include"../Cipher.h"
+#include"../CipherFactory.h"
 #include"../CipherTypeUtils.h"
 
 #define CAESAR_RANGE_ST 32
@@ -10,13 +11,23 @@ namespace encrypt {
   class CaesarCipher: public Cipher {
   public:
     CaesarCipher(unsigned step);
+
     clib::String encrypt(const clib::String& text) const override;
     clib::String decrypt(const clib::String& text) const override;
+
     CaesarCipher* clone() const override;
-    CipherType type() const override;
+
+    clib::String type() const override;
     clib::String serialize() const override;
   private:
     const unsigned step;
+  };
+
+  class CaesarCipherFactory: public CipherFactory {
+  public:
+    CaesarCipher* fromArgs(const clib::List<clib::String>& args) const override;
+    CaesarCipher* fromCin() const override;
+    clib::String type() const override;
   };
 }
 

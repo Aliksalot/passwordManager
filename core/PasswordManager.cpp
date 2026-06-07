@@ -8,7 +8,7 @@ namespace core {
       throw utils::NoFileOpenError();
   }
 
-  PasswordManager::PasswordManager() : currentFile(nullptr) { };
+  PasswordManager::PasswordManager() : currentFile(nullptr), password("") { };
 
   PasswordManager::~PasswordManager() {
     delete currentFile;
@@ -30,6 +30,7 @@ namespace core {
     try{
       currentFile = new PasswordFile(fname);
       currentFile->load(password);
+      this->password = password;
     }catch(...) {
       delete currentFile;
       throw;
@@ -37,17 +38,25 @@ namespace core {
   }
   
 
-  bool PasswordManager::closeFile() {
+  void PasswordManager::closeFile() {
     checkFileOpenOrThrow();
-
-    if(currentFile->hasUnsavedData()) {
-      return false;
-    }
 
     delete currentFile;
     currentFile = nullptr;
 
-    return true;
+    password = "";
+  }
+
+  bool PasswordManager::isFileDirty() {
+    checkFileOpenOrThrow();
+
+    return currentFile->hasUnsavedData();
+  }
+
+  void PasswordManager::saveFile() {
+    checkFileOpenOrThrow();
+
+    currentFile->save(password);
   }
 
   clib::List<const PasswordEntry*> PasswordManager::loadPassword(
@@ -93,6 +102,9 @@ namespace core {
   PasswordManager::PasswordManager(PasswordManager&& pm) noexcept {
     currentFile = pm.currentFile;
     pm.currentFile = nullptr;
+
+    password = pm.password;
+    pm.password = "";
   }
 
   PasswordManager& PasswordManager::operator=(PasswordManager&& pm) noexcept {
@@ -102,6 +114,9 @@ namespace core {
 
     currentFile = pm.currentFile;
     pm.currentFile = nullptr;
+
+    password = pm.password;
+    pm.password = "";
 
     return *this;
   }

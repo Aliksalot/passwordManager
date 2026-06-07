@@ -1,11 +1,13 @@
 #include"CaesarCipher.h"
+#include"../../utils/array.h"
+#include"../../utils/string.h"
 
 namespace encrypt{
 
   CaesarCipher::CaesarCipher(unsigned step): step(step) { }
 
-  CipherType CaesarCipher::type() const { 
-    return CipherType::CaesarCipher;
+  clib::String CaesarCipher::type() const { 
+    return "caesar_cipher";
   }
 
   clib::String CaesarCipher::serialize() const {
@@ -45,5 +47,18 @@ namespace encrypt{
   };
   CaesarCipher* CaesarCipher::clone() const {
     return new CaesarCipher(step);
+  }
+
+  CaesarCipher* CaesarCipherFactory::fromArgs(const clib::List<clib::String>& args) const {
+    return new CaesarCipher(atoi(args[0].raw()));
+  }
+  CaesarCipher* CaesarCipherFactory::fromCin() const {
+    clib::String input;
+    std::cout << "Ender caesar cipher shift (whole number): " << std::endl;
+    std::cin >> input;
+    return new CaesarCipher(atoi(input.raw()));
+  }
+  clib::String CaesarCipherFactory::type() const {
+    return "caesar_cipher";
   }
 }

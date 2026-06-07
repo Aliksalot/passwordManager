@@ -1,10 +1,12 @@
 #include"TestCipher.h"
 
+#include<iostream>
+
 namespace encrypt {
   TestCipher::TestCipher(const clib::String& secretword): secretword(secretword) { }
 
-  CipherType TestCipher::type() const { 
-    return CipherType::TestCipher;
+  clib::String TestCipher::type() const { 
+    return "test_cipher";
   }
 
   clib::String TestCipher::serialize() const {
@@ -23,5 +25,17 @@ namespace encrypt {
 
   clib::String TestCipher::fromPassword(const clib::String& password) {
     return password;
+  }
+
+  TestCipher* TestCipherFactory::fromArgs(const clib::List<clib::String>& args) const {
+    return new TestCipher(args[0]);
+  }
+  TestCipher* TestCipherFactory::fromCin() const {
+    clib::String key;
+    std::cin >> key;
+    return new TestCipher(key);
+  }
+  clib::String TestCipherFactory::type() const {
+    return "test_cipher";
   }
 }

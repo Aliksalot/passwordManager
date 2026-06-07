@@ -29,8 +29,8 @@ namespace encrypt {
   clib::String VignereCipher::serialize() const {
     return fromZ96(key);
   }
-  CipherType VignereCipher::type() const { 
-    return CipherType::VignereCipher;
+  clib::String VignereCipher::type() const { 
+    return "vignere_cipher";
   }
 
   VignereCipher* VignereCipher::clone() const {
@@ -55,5 +55,18 @@ namespace encrypt {
       res += char(code.raw() + ' ');
     }
     return res;
+  }
+
+  VignereCipher* VignereCipherFactory::fromArgs(const clib::List<clib::String>& args) const {
+    return new VignereCipher(args[0]);
+  }
+  VignereCipher* VignereCipherFactory::fromCin() const {
+    clib::String key;
+    std::cout << "Enter vignere cipher keyword: " << std::endl;
+    std::cin >> key;
+    return new VignereCipher(key);
+  }
+  clib::String VignereCipherFactory::type() const {
+    return "vignere_cipher";
   }
 }

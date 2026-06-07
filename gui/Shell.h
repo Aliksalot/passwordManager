@@ -12,6 +12,12 @@ namespace gui {
   class Shell {
   private:
     core::PasswordManager pm;
+
+    bool promptSave();
+
+    static std::istream& in();
+    static void print(const clib::String& s);
+    static void print_line(const clib::String& s, char eol = '\n');
   public:
     Shell();
     void open(const TokenList& t);
@@ -23,5 +29,6 @@ namespace gui {
     void remove(const TokenList& t);
     void list(const TokenList& t);
     void exit(const TokenList& t);
+    void help();
   };
 }

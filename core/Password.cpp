@@ -80,6 +80,6 @@ namespace core {
   clib::String PasswordEntry::serialize() const {
     return 
       website + "\t" + username + "\t" + passwordEncrypted
-        + "\t" + cipherTypeToString(cipher->type()) + "\t" + cipher->serialize();
+        + "\t" + cipher->type() + "\t" + cipher->serialize();
   }
 }
