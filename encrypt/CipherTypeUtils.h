@@ -1,6 +1,7 @@
 #pragma once
 #include"../utils/string.h"
 #include"../utils/exceptions.h"
+#include<iostream>
 
 namespace encrypt{
   enum class CipherType {
@@ -12,10 +13,10 @@ namespace encrypt{
   };
   inline clib::String cipherTypeToString (encrypt::CipherType t) {
     switch(t) {
-      case CipherType::TestCipher: return clib::String("test_cipher");
-      case CipherType::CaesarCipher: return clib::String("caesar_cipher");
-      case CipherType::TextCode: return clib::String("text_code");
-      case CipherType::HillCipher: return clib::String("hill_cipher");
+      case CipherType::TestCipher:    return clib::String("test_cipher");
+      case CipherType::CaesarCipher:  return clib::String("caesar_cipher");
+      case CipherType::TextCode:      return clib::String("text_code");
+      case CipherType::HillCipher:    return clib::String("hill_cipher");
       case CipherType::VignereCipher: return clib::String("vignere_cipher");
     }
 

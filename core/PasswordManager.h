@@ -13,7 +13,7 @@
 
 namespace core{
   
-  /*Called needs to handle a NoFileOpenError by convention*/
+  /*Called needs to handle utils::NoFileOpenError by convention*/
   class PasswordManager {
   private:
     PasswordFile* currentFile = nullptr;
