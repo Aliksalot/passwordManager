@@ -16,7 +16,6 @@ namespace core{
   class PasswordManager {
   private:
     PasswordFile* currentFile = nullptr;
-    clib::String password = "";
 
     void checkFileOpenOrThrow() const;
   public:
@@ -32,7 +31,7 @@ namespace core{
 
     void closeFile();
 
-    bool isFileDirty();
+    bool isFileDirty() const;
     
     clib::List<const PasswordEntry*> loadPassword(
       const clib::String& website,
@@ -60,7 +59,7 @@ namespace core{
     
     clib::List<const PasswordView*> list() const;
 
-    void saveFile();
+    void saveFile(const clib::String& password);
 
     ~PasswordManager();
 

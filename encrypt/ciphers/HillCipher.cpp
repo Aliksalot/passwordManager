@@ -3,6 +3,8 @@
 #include"../Cipher.h"
 #include"../../math/SqMatrix.h"
 #include"../../math/RemRing.h"
+#include"../../gui/Shell.h"
+#include"../../utils/exceptions.h"
 
 namespace encrypt {
   HillCipher::HillCipher(math::SqMatrix m): m(m) { };
@@ -50,9 +52,39 @@ namespace encrypt {
   HillCipher* HillCipherFactory::fromArgs(const clib::List<clib::String>& args) const {
     return new HillCipher(math::SqMatrix::deserialize(args[0]));
   }
-  HillCipher* HillCipherFactory::fromCin() const {
-    throw std::logic_error("TODO");
+
+  HillCipher* HillCipherFactory::fromShell(gui::Shell& shell) const {
+    while(1) {
+      shell.print_line("Enter matrix dimension: ");
+      clib::String dimStr;
+      clib::getLine(shell.in(), dimStr);
+      std::size_t dim = dimStr.toInt();
+
+      math::DataList dl;
+      for(std::size_t r = 0; r < dim; r++) {
+        dl.add(clib::List<math::Z26>());
+        shell.print_line("Enter row " + clib::String::fromInt(r) + " (Separate with spaces): ");
+        clib::String line;
+        clib::getLine(shell.in(), line);
+        auto tokens = line.split(' ');
+        if(tokens.size() != dim) {
+          shell.print_line("Row must have exactly dim elements");
+          r--;
+          continue;
+        }
+        for(std::size_t c = 0; c < dim; c++) {
+          dl[r].add((int)tokens[c].toInt());
+        }
+      }
+      try{
+        math::SqMatrix m(dl); 
+        return new HillCipher(m);
+      }catch(const utils::MathError& e){
+        shell.print_line("Matrix is probably not invertable. Try again.");
+      }
+    }
   }
+
   clib::String HillCipherFactory::type() const {
     return "hill_cipher";
   }

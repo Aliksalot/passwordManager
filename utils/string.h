@@ -52,7 +52,7 @@ namespace clib{
       l.remove(0);
     }
 
-    while(!l.empty() && *l.end() == c) {
+    while(!l.empty() && l[l.size() - 1] == c) {
       l.remove(l.size() - 1);
     }
 
@@ -224,7 +224,16 @@ namespace clib{
   inline const char* String::raw() const{
     return l.size() ? &l[0] : "";
   }
-  
+
+  inline std::istream& getLine(std::istream& stream, clib::String& s, char delim = '\n') {
+    s.clear();
+    char c;
+    while(stream.get(c)) {
+        if(c == delim) break;
+        s += c;
+    }
+    return stream;
+  }
 
 }
 

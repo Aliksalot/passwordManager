@@ -1,4 +1,5 @@
 #include"TestCipher.h"
+#include"../../gui/Shell.h"
 
 #include<iostream>
 
@@ -30,9 +31,9 @@ namespace encrypt {
   TestCipher* TestCipherFactory::fromArgs(const clib::List<clib::String>& args) const {
     return new TestCipher(args[0]);
   }
-  TestCipher* TestCipherFactory::fromCin() const {
+  TestCipher* TestCipherFactory::fromShell(gui::Shell& shell) const {
     clib::String key;
-    std::cin >> key;
+    shell.in() >> key;
     return new TestCipher(key);
   }
   clib::String TestCipherFactory::type() const {

@@ -40,7 +40,7 @@ namespace encrypt {
   class TextCodeFactory: public CipherFactory {
   public:
     TextCode* fromArgs(const clib::List<clib::String>& args) const override;
-    TextCode* fromCin() const override;
+    TextCode* fromShell(gui::Shell& shell) const override;
     clib::String type() const override;
   };
 

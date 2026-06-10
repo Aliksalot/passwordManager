@@ -17,6 +17,11 @@ void run() {
 
   shell.print_line("Welcome to password manager. If you are new type \"help\" for  a list of commands.");
   while(1) {
+
+    if(!shell.isRunning()) {
+      shell.print_line("Goodbye!");
+      exit(0);
+    }
     shell.in().getline(lineRaw, 1024);
 
     clib::String line = lineRaw;
@@ -26,12 +31,11 @@ void run() {
     clib::List<clib::String> tokens = line.split(' ');
 
     if(tokens.empty()) continue;
+
     clib::String cmd = tokens[0];
     tokens.remove(0);
 
-    if(!shell.execute(cmd, tokens)) {
-      shell.print_line("Invalid command. Check \"help\" for a list of commands");
-    }
+    shell.execute(cmd, tokens);
   }
 }
 

@@ -3,6 +3,7 @@
 #include"../utils/array.h"
 #include<iostream>
 #include"./RemRing.h"
+#include"../utils/exceptions.h"
 
 namespace math {
 
@@ -86,7 +87,6 @@ namespace math {
 
   inline SqMatrix SqMatrix::deserialize(const clib::String& raw) {
     clib::List<clib::String> tokens = raw.split('&');
-    //TODO custom error MAYBE?
     if(tokens.empty())
       throw std::runtime_error("Serialized matrix format doesn't match expected!");
 
@@ -102,20 +102,21 @@ namespace math {
     }
     
     try{
-    for(std::size_t r = 0; r < dim; r ++) {
-      matrix.add(clib::List<Z26>());
-      inverse.add(clib::List<Z26>());
-      for(std::size_t c = 0; c < dim; c ++) {
-        matrix[r].add(tokens[
-          1 + c + (r * dim)
-        ].toInt());
-        inverse[r].add(tokens[
-          1 + dim*dim + c + (r * dim)
-        ].toInt());
+      for(std::size_t r = 0; r < dim; r ++) {
+        matrix.add(clib::List<Z26>());
+        inverse.add(clib::List<Z26>());
+        for(std::size_t c = 0; c < dim; c ++) {
+          matrix[r].add(tokens[
+            1 + c + (r * dim)
+          ].toInt());
+          inverse[r].add(tokens[
+            1 + dim*dim + c + (r * dim)
+          ].toInt());
+        }
       }
-    }
-    }catch(const std::out_of_range& e) {
+    }catch(const std::exception& e) {
       std::cout << "Got " << e.what() << "\nWhile decypting. Format is possibly wrong" << std::endl;
+      throw;
     }
 
     return SqMatrix(matrix, inverse);
@@ -177,9 +178,8 @@ namespace math {
           break;
         }
       }
-      //TODO add custom error
       if(pivotColumn < 0)
-        throw std::runtime_error("Matrix not invertable!");
+        throw utils::MathError("Matrix not invertable!");
       
       Z26 pivotInverse = thisDataCopy[r][pivotColumn].inverse();
 

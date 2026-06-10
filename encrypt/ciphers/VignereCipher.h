@@ -29,7 +29,7 @@ namespace encrypt {
   class VignereCipherFactory: public CipherFactory {
   public:
     VignereCipher* fromArgs(const clib::List<clib::String>& args) const override;
-    VignereCipher* fromCin() const override;
+    VignereCipher* fromShell(gui::Shell& shell) const override;
     clib::String type() const override;
   };
 }

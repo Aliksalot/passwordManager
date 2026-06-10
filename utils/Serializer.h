@@ -46,7 +46,7 @@ namespace utils {
 
       return l;
     }
-    static clib::String serializePasswords (clib::List<core::PasswordEntry> data) {
+    static clib::String serializePasswords (const clib::List<core::PasswordEntry>& data) {
       clib::String result;
       std::size_t passCount = data.size();
       for(std::size_t i = 0; i < passCount; i ++) {

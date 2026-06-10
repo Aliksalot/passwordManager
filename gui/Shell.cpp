@@ -11,7 +11,17 @@
 
 namespace gui {
 
+  bool Shell::isRunning() const {
+    return running;
+  }
+
+  void Shell::stop() {
+    running = false;
+  }
+
   Shell::Shell() {
+
+    running = true;
 
     commands.add(Command(
       "open",
@@ -52,7 +62,7 @@ namespace gui {
         try{
           
           encrypt::Cipher* defaultCipher = encrypt::CipherRegistry::get()
-            .byType(t[1])->fromCin();
+            .byType(t[1])->fromShell(shell);
 
           shell.pm.createFile(t[0], defaultCipher, t[2]);
 
@@ -82,12 +92,15 @@ namespace gui {
             shell.print_line("Too few arguments: Invalid usage -> " + cmd.usage);
           }else if(t.size() == 3) {
             shell.pm.newPassword(t[0], t[1], t[2]);
+            shell.print_line("Added new entry!");
           }else if(t.size() == 4) {
             encrypt::Cipher* cipher = encrypt::CipherRegistry::get()
-              .byType(t[2])->fromCin();
+              .byType(t[2])->fromShell(shell);
 
             if(!shell.pm.newPassword(t[0], t[1], t[3], cipher)) {
               shell.print_line("Couldn't add new password entry. ");
+            }else {
+              shell.print_line("Added new entry!");
             }
           }else {
             shell.print_line("Too many arguments: Invalid usage -> " + cmd.usage);
@@ -172,9 +185,11 @@ namespace gui {
           shell.print_line("Warning - you are about to delete all passwords for website " + website + ". Are you sure?");
           if(shell.promptConfirm()) {
             shell.pm.deletePassword(website);
+            shell.print_line("Delete successfull!");
           }
         }else if(t.size() == 2) {
           shell.pm.deletePassword(t[0], t[1]);
+          shell.print_line("Delete successfull!");
         }else{
           shell.print_line("Too many arguments: Invalid usage -> " + cmd.usage);
         }
@@ -212,7 +227,11 @@ namespace gui {
         if(shell.pm.isFileDirty()) {
           shell.print_line("File has unsaved changes. Do you wish to save before leaving?");
           if(shell.promptConfirm()) {
-            shell.pm.saveFile();
+            clib::String password = shell.promptForPassword();
+            if(password.empty()) {
+              shell.print_line("Password can not be empty!"); return;
+            }
+            shell.pm.saveFile(password);
           }
         }
         shell.pm.closeFile();
@@ -224,14 +243,22 @@ namespace gui {
       "exit",
       "Exits the program. If current file is dirty, you will be prompted to save it.",
       [](Command&, Shell& shell, const clib::List<clib::String>&) {
+        if(!shell.pm.hasOpenFile()) {
+          shell.stop();
+          return;
+        }
         if(shell.pm.isFileDirty()) {
           shell.print_line("File has unsaved changes. Do you wish to save before leaving?");
           if(shell.promptConfirm()) {
-            shell.pm.saveFile();
+            clib::String password = shell.promptForPassword();
+            if(password.empty()) {
+              shell.print_line("Password can not be empty!"); return;
+            }
+            shell.pm.saveFile(password);
           }
         }
         shell.pm.closeFile();
-        exit(0);
+        shell.stop();
       }
     ));
 
@@ -241,7 +268,7 @@ namespace gui {
       "How did we get here?",
       [](Command&, Shell& shell, const clib::List<clib::String>&) {
         for(auto& cmd: shell.commands) {
-        shell.print_line(cmd.usage + " - " + cmd.description);
+          shell.print_line(cmd.usage + " - " + cmd.description);
         }
       }
     ));
@@ -255,7 +282,12 @@ namespace gui {
           shell.print_line("No file open");
           return;
         }
-        shell.pm.saveFile();
+        clib::String password = shell.promptForPassword();
+        if(password.empty()) {
+          shell.print_line("Password can not be empty!"); return;
+        }
+        shell.pm.saveFile(password);
+        shell.print_line("File saved successfully!");
       }
     ));
     commands.add(Command(
@@ -282,6 +314,13 @@ namespace gui {
     }while(true);
   }
 
+  clib::String Shell::promptForPassword() {
+    print_line("Enter this file's password: ");
+    clib::String password;
+    in() >> password;
+    return password;
+  }
+
   std::istream& Shell::in() {
     std::cout << "pm < ";
     if(pm.hasOpenFile()) {
@@ -297,20 +336,28 @@ namespace gui {
     }
     std::cout << s;
   }
-  void Shell::print_line(clib::String s, char eol) const {
-    print(s += eol);
+  void Shell::print_line(clib::String s) const {
+    print(s += '\n');
   }
 
-  bool Shell::execute(const clib::String& s, const TokenList& tokens) {
+  void Shell::execute(clib::String s, const TokenList& tokens) {
+
+    if(s.trim(' ').empty()) {
+      return;
+    }
+
+    if(!running) {
+      throw std::runtime_error("Shell has already been exited. ");
+    }
 
     for(Command& cmd: commands) {
       if(cmd.command == s) {
         cmd.call(cmd, *this, tokens);
-        return true;
+        return;
       }
     }
 
-    return false;
+    print_line("Invalid command. Check \"help\" for a list of commands");
   }
 
 }

@@ -138,7 +138,7 @@ namespace core {
     content += utils::Serializer::serializeCipher(defaultCipher) + "\n";
     content += utils::Serializer::serializePasswords(passwords);
 
-    clib::String encryptedPasswords = utils::FileEncrypt::encrypt(content, password);
+    clib::String encryptedPasswords = utils::encryptFile(content, password);
     file.write(encryptedPasswords.raw(), encryptedPasswords.size());
 
     hasUnsaved = false;
@@ -157,7 +157,7 @@ namespace core {
         content += c;
     }
 
-    content = utils::FileEncrypt::decrypt(content, password);
+    content = utils::decryptFile(content, password);
 
     clib::List<clib::String> lines = content.split('\n');
 

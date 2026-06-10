@@ -6,6 +6,7 @@
 #include"../../utils/string.h"
 #include"../../utils/array.h"
 #include"../../utils/exceptions.h"
+#include"../../gui/Shell.h"
 
 namespace encrypt {
   TextCode::TextCode(clib::String path): path(path) { };
@@ -78,16 +79,13 @@ namespace encrypt {
   TextCode* TextCodeFactory::fromArgs(const clib::List<clib::String>& args) const {
     return new TextCode(args[0]);
   }
-  TextCode* TextCodeFactory::fromCin() const {
+  TextCode* TextCodeFactory::fromShell(gui::Shell& shell) const {
 
-    std::cout << "Provide a file, with which to encrypt your password(s): " << std::endl;
+    shell.print_line("Provide a file, with which to encrypt your password(s): ");
 
     clib::String fpath;
-    char c = 0;
 
-    while(std::cin.get(c) && c != '\n') {
-      fpath += c;
-    }
+    clib::getLine(shell.in(), fpath);
 
     return new TextCode(fpath);
   }

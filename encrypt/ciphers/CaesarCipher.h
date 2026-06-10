@@ -7,6 +7,10 @@
 #define CAESAR_RANGE_END 126
 #define CAESAR_ALPHABET_SIZE (CAESAR_RANGE_END - CAESAR_RANGE_ST + 1)
 
+namespace gui {
+  class Shell;
+}
+
 namespace encrypt {
   class CaesarCipher: public Cipher {
   public:
@@ -26,7 +30,7 @@ namespace encrypt {
   class CaesarCipherFactory: public CipherFactory {
   public:
     CaesarCipher* fromArgs(const clib::List<clib::String>& args) const override;
-    CaesarCipher* fromCin() const override;
+    CaesarCipher* fromShell(gui::Shell& shell) const override;
     clib::String type() const override;
   };
 }

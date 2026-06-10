@@ -43,7 +43,16 @@ namespace math {
 
   template<int Mod>
   inline bool RemRing<Mod>::isZeroDivisor() const {
-    return (n != 0) && (n % 2 == 0 || n == 13);
+    
+    int q = Mod, d = n;
+
+    while (d != 0) {
+        int remainder = q % d;
+        q = d;
+        d = remainder;
+    }
+
+    return q > 1;
   }
 
   template<int Mod>

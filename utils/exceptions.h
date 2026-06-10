@@ -41,4 +41,11 @@ namespace utils {
     PasswordModifyError(const char* s): std::runtime_error(s) {}
     PasswordModifyError(const clib::String& s): std::runtime_error(s.raw()) {}
   };
+  class MathError : public std::invalid_argument {
+  public:
+    MathError(): std::invalid_argument("You did something wrong, but we \
+        are unsure what it is") {}
+    MathError(const char* s): std::invalid_argument(s) {}
+    MathError(const clib::String& s): std::invalid_argument(s.raw()) {}
+  };
 }

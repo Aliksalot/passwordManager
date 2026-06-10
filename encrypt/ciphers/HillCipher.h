@@ -29,7 +29,7 @@ namespace encrypt {
   class HillCipherFactory: public CipherFactory {
   public:
     HillCipher* fromArgs(const clib::List<clib::String>& args) const override;
-    HillCipher* fromCin() const override;
+    HillCipher* fromShell(gui::Shell& shell) const override;
     clib::String type() const override;
   };
 

@@ -1,6 +1,7 @@
 #include"CaesarCipher.h"
 #include"../../utils/array.h"
 #include"../../utils/string.h"
+#include"../../gui/Shell.h"
 
 namespace encrypt{
 
@@ -52,9 +53,9 @@ namespace encrypt{
   CaesarCipher* CaesarCipherFactory::fromArgs(const clib::List<clib::String>& args) const {
     return new CaesarCipher(atoi(args[0].raw()));
   }
-  CaesarCipher* CaesarCipherFactory::fromCin() const {
+  CaesarCipher* CaesarCipherFactory::fromShell(gui::Shell& shell) const {
     clib::String input;
-    std::cout << "Ender caesar cipher shift (whole number): " << std::endl;
+    shell.print_line("Ender caesar cipher shift (whole number): ");
     std::cin >> input;
     return new CaesarCipher(atoi(input.raw()));
   }

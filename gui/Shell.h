@@ -12,18 +12,25 @@ namespace gui {
 
   class Shell {
   private:
+
+    bool running;
     core::PasswordManager pm;
     
     clib::List<Command> commands;
 
     bool promptConfirm();
+    clib::String promptForPassword();
   public:
     Shell();
 
-    bool execute(const clib::String& cmd, const TokenList& t);
+    void execute(clib::String cmd, const TokenList& t);
+
+    bool isRunning() const;
+    
+    void stop();
 
     void print(const clib::String& s) const;
-    void print_line(clib::String s, char eol = '\n') const;
+    void print_line(clib::String s) const;
     std::istream& in();
   };
 }

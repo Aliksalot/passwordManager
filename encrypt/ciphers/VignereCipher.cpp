@@ -1,5 +1,6 @@
 #include "VignereCipher.h"
 #include "../CipherTypeUtils.h"
+#include "../../gui/Shell.h"
 #include<iostream>
 
 namespace encrypt {
@@ -60,10 +61,10 @@ namespace encrypt {
   VignereCipher* VignereCipherFactory::fromArgs(const clib::List<clib::String>& args) const {
     return new VignereCipher(args[0]);
   }
-  VignereCipher* VignereCipherFactory::fromCin() const {
+  VignereCipher* VignereCipherFactory::fromShell(gui::Shell& shell) const {
     clib::String key;
-    std::cout << "Enter vignere cipher keyword: " << std::endl;
-    std::cin >> key;
+    shell.print_line("Enter vignere cipher keyword: ");
+    getLine(shell.in(), key);
     return new VignereCipher(key);
   }
   clib::String VignereCipherFactory::type() const {

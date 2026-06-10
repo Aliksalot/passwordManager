@@ -61,6 +61,10 @@ namespace core {
   PasswordEntry& PasswordEntry::operator=(PasswordEntry&& p) {
     if(this == &p) return *this;
 
+    website = p.website;
+    username = p.username;
+    passwordEncrypted = p.passwordEncrypted;
+
     p.website = "";
     p.username = "";
     p.passwordEncrypted = "";

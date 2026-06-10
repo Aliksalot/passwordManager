@@ -1,16 +1,10 @@
 #pragma once
 
 namespace utils {
-
-  class FileEncrypt {
-
-  public:
-    static clib::String encrypt(const clib::String& raw, const clib::String& password);
-
-    static clib::String decrypt(const clib::String& raw, const clib::String& password);
-  };
-
-  inline clib::String FileEncrypt::encrypt(const clib::String& raw, const clib::String& password)  {
+  inline clib::String encryptFile(const clib::String& raw, clib::String password)  {
+    if(password.trim(' ').empty()) {
+      throw std::runtime_error("Empty password is not permitted");
+    }
     clib::String out = raw;
 
     for(std::size_t i = 0; i < raw.size(); i ++) {
@@ -20,7 +14,8 @@ namespace utils {
 
     return out;
   }
-  inline clib::String FileEncrypt::decrypt(const clib::String& raw, const clib::String& password) {
-    return encrypt(raw, password);
+
+  inline clib::String decryptFile(const clib::String& raw, const clib::String& password) {
+    return encryptFile(raw, password);
   }
 }

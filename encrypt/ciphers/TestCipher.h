@@ -21,7 +21,7 @@ namespace encrypt {
   class TestCipherFactory: public CipherFactory {
   public:
     TestCipher* fromArgs(const clib::List<clib::String>& args) const override;
-    TestCipher* fromCin() const override;
+    TestCipher* fromShell(gui::Shell& shell) const override;
     clib::String type() const override;
   };
 }
