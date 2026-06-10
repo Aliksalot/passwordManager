@@ -1,8 +1,8 @@
 #include"Shell.h"
 #include"Command.h"
 
-#include"../utils/string.h"
-#include"../utils/array.h"
+#include"../utils/mystring.h"
+#include"../utils/darray.h"
 #include"../core/Password.h"
 #include"../core/PasswordView.h"
 #include"../encrypt/CipherRegistry.h"
@@ -27,7 +27,7 @@ namespace gui {
       "open",
       "open <filename> <password>",
       "Decrypts the file at <filename> with <password> and loads it, allowing you to modify its content.",
-      [](Command& cmd, Shell& shell, const clib::List<clib::String>& t) {
+      [](Command& cmd, Shell& shell, const clib::darray<clib::Text>& t) {
         if(t.size() < 2){
           shell.print_line("Invalid usage -> " + cmd.usage);
           return;
@@ -53,7 +53,7 @@ namespace gui {
       "create",
       "create <filename> <cipher> <password>",
       "Creates a new file at <filename>. <cipher> will be used as a default cipher to encrypt the password entries. <password> is used to protect the file.",
-      [](Command& cmd, Shell& shell, const clib::List<clib::String>& t) {
+      [](Command& cmd, Shell& shell, const clib::darray<clib::Text>& t) {
         if(t.size() != 3) {
           shell.print_line("Needs exactly 3 arguments: Invalid usage -> " + cmd.usage);
           return;
@@ -82,7 +82,7 @@ namespace gui {
       "save",
       "save <website> <username> [<cipher>] <password>",
       "Creates a new password entry. If you don't provide [<cipher>] the default one will be used.",
-      [](Command& cmd, Shell& shell, const clib::List<clib::String>& t) {
+      [](Command& cmd, Shell& shell, const clib::darray<clib::Text>& t) {
         if(!shell.pm.hasOpenFile()) {
           shell.print_line("No file open");
           return;
@@ -119,13 +119,13 @@ namespace gui {
       "load",
       "load <website> [<username>]",
       "Prints on screen all password entries that match your query with passwords DECRYPTED.",
-      [](Command& cmd, Shell& shell, const clib::List<clib::String>& t) {
+      [](Command& cmd, Shell& shell, const clib::darray<clib::Text>& t) {
         if(!shell.pm.hasOpenFile()) {
           shell.print_line("No file open");
           return;
         }
 
-        clib::List<const core::PasswordEntry*> matches;
+        clib::darray<const core::PasswordEntry*> matches;
         if(t.size() < 1) {
           shell.print_line("Too few arguments: Invalid usage -> " + cmd.usage);
         }else if(t.size() == 1) {
@@ -146,7 +146,7 @@ namespace gui {
       "update",
       "update <website> <username> <new-password>",
       "Updates entry.",
-      [](Command& cmd, Shell& shell, const clib::List<clib::String>& t) {
+      [](Command& cmd, Shell& shell, const clib::darray<clib::Text>& t) {
         if(!shell.pm.hasOpenFile()) {
           shell.print_line("No file open");
           return;
@@ -172,7 +172,7 @@ namespace gui {
       "delete",
       "delete <website> [<username>]",
       "Deletes one or multiple entries. If you don't provide a [<username>], you will be prompted to delete all entries from <website>.",
-      [](Command& cmd, Shell& shell, const clib::List<clib::String>& t) {
+      [](Command& cmd, Shell& shell, const clib::darray<clib::Text>& t) {
         if(!shell.pm.hasOpenFile()) {
           shell.print_line("No file open");
           return;
@@ -181,7 +181,7 @@ namespace gui {
         if(t.size() < 1) {
           shell.print_line("Too few arguments: Invalid usage -> " + cmd.usage);
         }else if(t.size() == 1) {
-          const clib::String& website = t[0];
+          const clib::Text& website = t[0];
           shell.print_line("Warning - you are about to delete all passwords for website " + website + ". Are you sure?");
           if(shell.promptConfirm()) {
             shell.pm.deletePassword(website);
@@ -200,13 +200,13 @@ namespace gui {
       "list",
       "list",
       "Prints on screen all entries WITHOUT sensitive data (only website and username).",
-      [](Command&, Shell& shell, const clib::List<clib::String>&) {
+      [](Command&, Shell& shell, const clib::darray<clib::Text>&) {
         if(!shell.pm.hasOpenFile()) {
           shell.print_line("No file open");
           return;
         }
 
-        clib::List<const core::PasswordView*> passwords =
+        clib::darray<const core::PasswordView*> passwords =
           shell.pm.list();
 
         for(auto& pass: passwords) {
@@ -219,7 +219,7 @@ namespace gui {
       "close",
       "close",
       "Closes current file. If it's dirty, you will be prompted.",
-      [](Command&, Shell& shell, const clib::List<clib::String>&) {
+      [](Command&, Shell& shell, const clib::darray<clib::Text>&) {
         if(!shell.pm.hasOpenFile()) {
           shell.print_line("No file open");
           return;
@@ -227,7 +227,7 @@ namespace gui {
         if(shell.pm.isFileDirty()) {
           shell.print_line("File has unsaved changes. Do you wish to save before leaving?");
           if(shell.promptConfirm()) {
-            clib::String password = shell.promptForPassword();
+            clib::Text password = shell.promptForPassword();
             if(password.empty()) {
               shell.print_line("Password can not be empty!"); return;
             }
@@ -242,7 +242,7 @@ namespace gui {
       "exit",
       "exit",
       "Exits the program. If current file is dirty, you will be prompted to save it.",
-      [](Command&, Shell& shell, const clib::List<clib::String>&) {
+      [](Command&, Shell& shell, const clib::darray<clib::Text>&) {
         if(!shell.pm.hasOpenFile()) {
           shell.stop();
           return;
@@ -250,7 +250,7 @@ namespace gui {
         if(shell.pm.isFileDirty()) {
           shell.print_line("File has unsaved changes. Do you wish to save before leaving?");
           if(shell.promptConfirm()) {
-            clib::String password = shell.promptForPassword();
+            clib::Text password = shell.promptForPassword();
             if(password.empty()) {
               shell.print_line("Password can not be empty!"); return;
             }
@@ -266,7 +266,7 @@ namespace gui {
       "help",
       "help",
       "How did we get here?",
-      [](Command&, Shell& shell, const clib::List<clib::String>&) {
+      [](Command&, Shell& shell, const clib::darray<clib::Text>&) {
         for(auto& cmd: shell.commands) {
           shell.print_line(cmd.usage + " - " + cmd.description);
         }
@@ -277,12 +277,12 @@ namespace gui {
       "save_file",
       "save_file",
       "Saves the currently opened file.",
-      [](Command&, Shell& shell, const clib::List<clib::String>&) {
+      [](Command&, Shell& shell, const clib::darray<clib::Text>&) {
         if(!shell.pm.hasOpenFile()) {
           shell.print_line("No file open");
           return;
         }
-        clib::String password = shell.promptForPassword();
+        clib::Text password = shell.promptForPassword();
         if(password.empty()) {
           shell.print_line("Password can not be empty!"); return;
         }
@@ -294,7 +294,7 @@ namespace gui {
       "ciphers",
       "ciphers",
       "Provides a list of all implemented ciphers.",
-      [](Command&, Shell& shell, const clib::List<clib::String>&) {
+      [](Command&, Shell& shell, const clib::darray<clib::Text>&) {
         for(auto& ct: encrypt::CipherRegistry::get().cipherTypes()) {
           shell.print_line(ct);
         }
@@ -303,7 +303,7 @@ namespace gui {
   }
 
   bool Shell::promptConfirm() {
-    clib::String w;
+    clib::Text w;
     do{
       print_line("(y)es or (n)o");
       in() >> w;
@@ -314,9 +314,9 @@ namespace gui {
     }while(true);
   }
 
-  clib::String Shell::promptForPassword() {
+  clib::Text Shell::promptForPassword() {
     print_line("Enter this file's password: ");
-    clib::String password;
+    clib::Text password;
     in() >> password;
     return password;
   }
@@ -329,18 +329,18 @@ namespace gui {
     return std::cin;
   }
 
-  void Shell::print(const clib::String& s) const {
+  void Shell::print(const clib::Text& s) const {
     std::cout << "pm > ";
     if(pm.hasOpenFile()) {
       std::cout << pm.getFilePath() << " > ";
     }
     std::cout << s;
   }
-  void Shell::print_line(clib::String s) const {
+  void Shell::print_line(clib::Text s) const {
     print(s += '\n');
   }
 
-  void Shell::execute(clib::String s, const TokenList& tokens) {
+  void Shell::execute(clib::Text s, const TokenList& tokens) {
 
     if(s.trim(' ').empty()) {
       return;

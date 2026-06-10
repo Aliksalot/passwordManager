@@ -1,14 +1,14 @@
 #pragma once
 
-#include"../utils/string.h"
-#include"../utils/array.h"
+#include"../utils/mystring.h"
+#include"../utils/darray.h"
 #include"./Command.h"
 
 #include"../core/PasswordManager.h"
 
 namespace gui {
   
-  using TokenList = clib::List<clib::String>;
+  using TokenList = clib::darray<clib::Text>;
 
   class Shell {
   private:
@@ -16,21 +16,21 @@ namespace gui {
     bool running;
     core::PasswordManager pm;
     
-    clib::List<Command> commands;
+    clib::darray<Command> commands;
 
     bool promptConfirm();
-    clib::String promptForPassword();
+    clib::Text promptForPassword();
   public:
     Shell();
 
-    void execute(clib::String cmd, const TokenList& t);
+    void execute(clib::Text cmd, const TokenList& t);
 
     bool isRunning() const;
     
     void stop();
 
-    void print(const clib::String& s) const;
-    void print_line(clib::String s) const;
+    void print(const clib::Text& s) const;
+    void print_line(clib::Text s) const;
     std::istream& in();
   };
 }

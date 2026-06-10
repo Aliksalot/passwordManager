@@ -5,7 +5,7 @@
 #include"./encrypt/ciphers/TextCode.h"
 #include"./encrypt/ciphers/HillCipher.h"
 #include"./encrypt/ciphers/VignereCipher.h"
-#include"./utils/string.h"
+#include"./utils/mystring.h"
 #include"./math/RemRing.h"
 #include"./math/SqMatrix.h"
 
@@ -24,15 +24,15 @@ void run() {
     }
     shell.in().getline(lineRaw, 1024);
 
-    clib::String line = lineRaw;
+    clib::Text line = lineRaw;
 
     line.trim(' ');
 
-    clib::List<clib::String> tokens = line.split(' ');
+    clib::darray<clib::Text> tokens = line.split(' ');
 
     if(tokens.empty()) continue;
 
-    clib::String cmd = tokens[0];
+    clib::Text cmd = tokens[0];
     tokens.remove(0);
 
     shell.execute(cmd, tokens);
@@ -47,9 +47,9 @@ void test() {
     "password"
   );
 
-  math::DataList dl;
-  dl.add(clib::List<math::Z26>());
-  dl.add(clib::List<math::Z26>());
+  math::Datadarray dl;
+  dl.add(clib::darray<math::Z26>());
+  dl.add(clib::darray<math::Z26>());
   dl[0].add(3);
   dl[0].add(3);
   dl[1].add(2);

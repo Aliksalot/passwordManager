@@ -4,33 +4,33 @@
 #include<iostream>
 
 namespace encrypt {
-  VignereCipher::VignereCipher(const clib::String& key)
+  VignereCipher::VignereCipher(const clib::Text& key)
    : key(toZ96(key)) { }
 
-  VignereCipher::VignereCipher(const clib::List<math::Z96>& key)
+  VignereCipher::VignereCipher(const clib::darray<math::Z96>& key)
    : key(key) { };
 
-  clib::String VignereCipher::encrypt(const clib::String& text) const {
-    clib::List<math::Z96> result;
-    clib::List<math::Z96> tokens = toZ96(text);
+  clib::Text VignereCipher::encrypt(const clib::Text& text) const {
+    clib::darray<math::Z96> result;
+    clib::darray<math::Z96> tokens = toZ96(text);
     for(std::size_t i = 0; i < text.size(); i ++) {
       result.add(tokens[i] + key[i % key.size()]);
     }
     return fromZ96(result);
   }
-  clib::String VignereCipher::decrypt(const clib::String& text) const {
-    clib::List<math::Z96> result;
-    clib::List<math::Z96> tokens = toZ96(text);
+  clib::Text VignereCipher::decrypt(const clib::Text& text) const {
+    clib::darray<math::Z96> result;
+    clib::darray<math::Z96> tokens = toZ96(text);
     for(std::size_t i = 0; i < text.size(); i ++) {
       result.add(tokens[i] - key[i % key.size()]);
     }
     return fromZ96(result);
   }
 
-  clib::String VignereCipher::serialize() const {
+  clib::Text VignereCipher::serialize() const {
     return fromZ96(key);
   }
-  clib::String VignereCipher::type() const { 
+  clib::Text VignereCipher::type() const { 
     return "vignere_cipher";
   }
 
@@ -38,8 +38,8 @@ namespace encrypt {
     return new VignereCipher(key);
   }
 
-  clib::List<math::Z96> VignereCipher::toZ96(const clib::String& text) {
-    clib::List<math::Z96> res;
+  clib::darray<math::Z96> VignereCipher::toZ96(const clib::Text& text) {
+    clib::darray<math::Z96> res;
     for(std::size_t i = 0; i < text.size(); i ++) {
       char c = text[i];
       if(c < ' ' || c > '~') {
@@ -50,24 +50,24 @@ namespace encrypt {
     return res;
   }
 
-  clib::String VignereCipher::fromZ96(const clib::List<math::Z96> tokens) {
-    clib::String res;
+  clib::Text VignereCipher::fromZ96(const clib::darray<math::Z96> tokens) {
+    clib::Text res;
     for(auto& code: tokens) {
       res += char(code.raw() + ' ');
     }
     return res;
   }
 
-  VignereCipher* VignereCipherFactory::fromArgs(const clib::List<clib::String>& args) const {
+  VignereCipher* VignereCipherFactory::fromArgs(const clib::darray<clib::Text>& args) const {
     return new VignereCipher(args[0]);
   }
   VignereCipher* VignereCipherFactory::fromShell(gui::Shell& shell) const {
-    clib::String key;
+    clib::Text key;
     shell.print_line("Enter vignere cipher keyword: ");
     getLine(shell.in(), key);
     return new VignereCipher(key);
   }
-  clib::String VignereCipherFactory::type() const {
+  clib::Text VignereCipherFactory::type() const {
     return "vignere_cipher";
   }
 }

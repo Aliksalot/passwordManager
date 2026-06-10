@@ -1,22 +1,22 @@
 #pragma once
 
-#include"../utils/string.h"
+#include"../utils/mystring.h"
 
 namespace gui {
 
   class Shell;
 
   struct Command {
-    clib::String command;
-    clib::String usage;
-    clib::String description;
-    void (*call)(Command& cmd, Shell& shell, const clib::List<clib::String>& t);
+    clib::Text command;
+    clib::Text usage;
+    clib::Text description;
+    void (*call)(Command& cmd, Shell& shell, const clib::darray<clib::Text>& t);
 
     Command(
-      const clib::String& command,
-      const clib::String& usage,
-      const clib::String& description,
-      void (*call)(gui::Command& cmd, Shell& shell, const clib::List<clib::String>& t)
+      const clib::Text& command,
+      const clib::Text& usage,
+      const clib::Text& description,
+      void (*call)(gui::Command& cmd, Shell& shell, const clib::darray<clib::Text>& t)
     ) : command(command), usage(usage), description(description), call(call) { };
   };
 }

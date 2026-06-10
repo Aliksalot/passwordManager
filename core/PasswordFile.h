@@ -4,7 +4,7 @@
 #include<iostream>
 
 #include"./Password.h"
-#include"../utils/array.h"
+#include"../utils/darray.h"
 #include"../encrypt/Cipher.h"
 #include"../utils/FileEncrypt.h"
 #include"../utils/Serializer.h"
@@ -14,25 +14,25 @@ namespace core{
 
   public:
     PasswordFile() = delete;
-    PasswordFile(clib::String path);
+    PasswordFile(clib::Text path);
     ~PasswordFile();
 
     const encrypt::Cipher* getDefaultCipher() const;
-    clib::String getPath() const;
-    clib::List<const PasswordEntry*> find(
-      const clib::String& website = "",
-      const clib::String& user = ""
+    clib::Text getPath() const;
+    clib::darray<const PasswordEntry*> find(
+      const clib::Text& website = "",
+      const clib::Text& user = ""
     ) const;
-    PasswordFile& remove(const clib::String& website, const clib::String& user = "");
+    PasswordFile& remove(const clib::Text& website, const clib::Text& user = "");
     PasswordFile& update(
-      const clib::String& website,
-      const clib::String& username,
-      const clib::String& password
+      const clib::Text& website,
+      const clib::Text& username,
+      const clib::Text& password
     );
     PasswordFile& add(
-      const clib::String& website,
-      const clib::String& username,
-      const clib::String& password,
+      const clib::Text& website,
+      const clib::Text& username,
+      const clib::Text& password,
       encrypt::Cipher* cipher = nullptr
     );
 
@@ -44,14 +44,14 @@ namespace core{
     PasswordFile(PasswordFile&&) = delete;
     PasswordFile& operator=(PasswordFile&&) = delete;
 
-    void createFile(encrypt::Cipher* cipher, const clib::String& password);
-    void load(const clib::String& password);
-    void save(const clib::String& password);
+    void createFile(encrypt::Cipher* cipher, const clib::Text& password);
+    void load(const clib::Text& password);
+    void save(const clib::Text& password);
 
     bool hasUnsavedData() const;
   private:
-    clib::List<PasswordEntry> passwords;
-    clib::String path;
+    clib::darray<PasswordEntry> passwords;
+    clib::Text path;
     encrypt::Cipher* defaultCipher = nullptr;
 
     bool hasUnsaved = false;

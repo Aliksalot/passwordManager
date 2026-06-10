@@ -1,6 +1,6 @@
 #include"CipherRegistry.h"
-#include"../utils/array.h"
-#include"../utils/string.h"
+#include"../utils/darray.h"
+#include"../utils/mystring.h"
 #include"Cipher.h"
 #include"CipherFactory.h"
 #include"../utils/exceptions.h"
@@ -33,14 +33,14 @@ namespace encrypt {
     }
   }
 
-  const CipherFactory* CipherRegistry::byType(clib::String type) const {
+  const CipherFactory* CipherRegistry::byType(clib::Text type) const {
     for(auto& cf: list) {
       if(cf->type() == type) {
         return cf;
       }
     }
 
-    throw utils::InvalidCipherTypeError(clib::String("Invalid cipher: ") + type + "\nNote: If you \
+    throw utils::InvalidCipherTypeError(clib::Text("Invalid cipher: ") + type + "\nNote: If you \
 are a developer and think this is a mistake, check if you have forgotten to register a new \
 CipherType");
   }
@@ -50,8 +50,8 @@ CipherType");
     return cf;
   }
 
-  clib::List<clib::String> CipherRegistry::cipherTypes() const {
-    clib::List<clib::String> types;
+  clib::darray<clib::Text> CipherRegistry::cipherTypes() const {
+    clib::darray<clib::Text> types;
     for(auto& factory: list) {
       types.add(factory->type());
     }

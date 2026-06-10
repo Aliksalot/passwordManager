@@ -1,11 +1,11 @@
 #pragma once
 
 namespace utils {
-  inline clib::String encryptFile(const clib::String& raw, clib::String password)  {
+  inline clib::Text encryptFile(const clib::Text& raw, clib::Text password)  {
     if(password.trim(' ').empty()) {
       throw std::runtime_error("Empty password is not permitted");
     }
-    clib::String out = raw;
+    clib::Text out = raw;
 
     for(std::size_t i = 0; i < raw.size(); i ++) {
       char k = password[i % password.size()];
@@ -15,7 +15,7 @@ namespace utils {
     return out;
   }
 
-  inline clib::String decryptFile(const clib::String& raw, const clib::String& password) {
+  inline clib::Text decryptFile(const clib::Text& raw, const clib::Text& password) {
     return encryptFile(raw, password);
   }
 }

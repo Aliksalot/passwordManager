@@ -1,19 +1,19 @@
 #pragma once
 
-#include"../utils/string.h"
+#include"../utils/mystring.h"
 
 namespace core {
   struct PasswordView {
   protected:
-    clib::String website;
-    clib::String username;
+    clib::Text website;
+    clib::Text username;
     
-    PasswordView(const clib::String& website, const clib::String& username);
+    PasswordView(const clib::Text& website, const clib::Text& username);
     PasswordView() = default;
   public:
-    clib::String getWebsite() const;
-    clib::String getUsername() const;
+    clib::Text getWebsite() const;
+    clib::Text getUsername() const;
 
-    virtual clib::String serialize() const;
+    virtual clib::Text serialize() const;
   };
 }

@@ -16,22 +16,22 @@ namespace encrypt {
   public:
     CaesarCipher(unsigned step);
 
-    clib::String encrypt(const clib::String& text) const override;
-    clib::String decrypt(const clib::String& text) const override;
+    clib::Text encrypt(const clib::Text& text) const override;
+    clib::Text decrypt(const clib::Text& text) const override;
 
     CaesarCipher* clone() const override;
 
-    clib::String type() const override;
-    clib::String serialize() const override;
+    clib::Text type() const override;
+    clib::Text serialize() const override;
   private:
     const unsigned step;
   };
 
   class CaesarCipherFactory: public CipherFactory {
   public:
-    CaesarCipher* fromArgs(const clib::List<clib::String>& args) const override;
+    CaesarCipher* fromArgs(const clib::darray<clib::Text>& args) const override;
     CaesarCipher* fromShell(gui::Shell& shell) const override;
-    clib::String type() const override;
+    clib::Text type() const override;
   };
 }
 

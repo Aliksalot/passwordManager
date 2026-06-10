@@ -22,44 +22,44 @@ namespace core{
     PasswordManager();
 
     void createFile(
-      const clib::String& fname,
+      const clib::Text& fname,
       encrypt::Cipher* defaultCipher,
-      const clib::String& password
+      const clib::Text& password
     );
 
-    void openFile(const clib::String& fname, const clib::String& password);
+    void openFile(const clib::Text& fname, const clib::Text& password);
 
     void closeFile();
 
     bool isFileDirty() const;
     
-    clib::List<const PasswordEntry*> loadPassword(
-      const clib::String& website,
-      const clib::String& user = ""
+    clib::darray<const PasswordEntry*> loadPassword(
+      const clib::Text& website,
+      const clib::Text& user = ""
     ) const;
 
     void updatePassword(
-      const clib::String& website,
-      const clib::String& user,
-      const clib::String& newPassword
+      const clib::Text& website,
+      const clib::Text& user,
+      const clib::Text& newPassword
     );
 
     bool newPassword(
-      const clib::String& website,
-      const clib::String& user,
-      const clib::String& newPassword,
+      const clib::Text& website,
+      const clib::Text& user,
+      const clib::Text& newPassword,
       encrypt::Cipher* cipher = nullptr
     );
 
-    void deletePassword(const clib::String& website, const clib::String& user = "");
+    void deletePassword(const clib::Text& website, const clib::Text& user = "");
 
     bool hasOpenFile() const;
   
-    clib::String getFilePath() const;
+    clib::Text getFilePath() const;
     
-    clib::List<const PasswordView*> list() const;
+    clib::darray<const PasswordView*> list() const;
 
-    void saveFile(const clib::String& password);
+    void saveFile(const clib::Text& password);
 
     ~PasswordManager();
 

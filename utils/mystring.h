@@ -1,6 +1,6 @@
 #pragma once
 
-#include"./array.h"
+#include"./darray.h"
 #include<cstddef>
 #include<stdexcept>
 #include<cstring>
@@ -9,30 +9,30 @@
 
 namespace clib{
 
-  class String {
+  class Text {
   public:
-    String();
-    String(const char* s);
-    String(const char* s, std::size_t len);
+    Text();
+    Text(const char* s);
+    Text(const char* s, std::size_t len);
 
     const char& operator[](std::size_t index) const;
     char& operator[](std::size_t index);
-    String& operator+=(const String& s);
-    String& operator+=(char c);
-    String& operator+=(const char* s);
-    String& operator=(const char* s);
-    bool operator==(const String& s) const;
+    Text& operator+=(const Text& s);
+    Text& operator+=(char c);
+    Text& operator+=(const char* s);
+    Text& operator=(const char* s);
+    bool operator==(const Text& s) const;
     bool operator==(const char* s) const;
-    bool operator!=(const String& s) const;
+    bool operator!=(const Text& s) const;
     bool operator!=(const char* s) const;
 
     long long toInt() const;
-    static String fromInt(long long i);
+    static Text fromInt(long long i);
 
-    String& insert(std::size_t at, char c);
-    String& trim(char c);
+    Text& insert(std::size_t at, char c);
+    Text& trim(char c);
 
-    List<String> split(char c) const;
+    darray<Text> split(char c) const;
 
     bool empty() const;
 
@@ -42,10 +42,10 @@ namespace clib{
     const char* raw() const;
 
   private:
-    List<char> l;
+    darray<char> l;
   };
 
-  inline String& String::trim(char c) {
+  inline Text& Text::trim(char c) {
     l.pop();
 
     while(!l.empty() && l[0] == c) {
@@ -60,40 +60,40 @@ namespace clib{
     return *this;
   }
 
-  inline void String::clear() {
+  inline void Text::clear() {
     l.clear();
     l.add('\0');
   }
-  inline std::size_t String::size() const {
+  inline std::size_t Text::size() const {
     return l.size() - 1;
   }
 
-  inline String::String() { l.add('\0'); };
-  inline String::String(const char* s): String(s, std::strlen(s)) { };
-  inline String::String(const char* s, std::size_t len) {
-    l = List<char>(s, len);
+  inline Text::Text() { l.add('\0'); };
+  inline Text::Text(const char* s): Text(s, std::strlen(s)) { };
+  inline Text::Text(const char* s, std::size_t len) {
+    l = darray<char>(s, len);
     l.add('\0');
   }
 
-  inline bool String::empty() const {
+  inline bool Text::empty() const {
     return size() == 0;
   }
 
-  inline String& String::operator=(const char* s) {
-    l = List<char>(s, std::strlen(s));
+  inline Text& Text::operator=(const char* s) {
+    l = darray<char>(s, std::strlen(s));
     l.add('\0');
     return *this;
   }
-  inline char& String::operator[](std::size_t index) {
+  inline char& Text::operator[](std::size_t index) {
     return l[index];
   }
 
-  inline const char& String::operator[](std::size_t index) const{
+  inline const char& Text::operator[](std::size_t index) const{
     return l[index];
   }
-  inline String& String::operator+=(const String& s) {
+  inline Text& Text::operator+=(const Text& s) {
     if(this == &s) {
-      String copy = s;
+      Text copy = s;
       l.pop();
       l.extend(copy.l);
       return *this;
@@ -102,20 +102,20 @@ namespace clib{
     l.extend(s.l);
     return *this;
   }
-  inline String& String::operator+=(char c) {
+  inline Text& Text::operator+=(char c) {
     l.pop();
     l.add(c);
     l.add('\0');
     return *this;
   }
-  inline String& String::operator+=(const char* s) {
-    return *this += String(s);
+  inline Text& Text::operator+=(const char* s) {
+    return *this += Text(s);
   }
-  inline String operator+(const String& a, const String& b) {
-    String result = a;
+  inline Text operator+(const Text& a, const Text& b) {
+    Text result = a;
     return result += b;
   }
-  inline bool String::operator==(const String& s) const {
+  inline bool Text::operator==(const Text& s) const {
     if(size() != s.size()) return false;
 
     for(std::size_t i = 0; i < size(); i ++) {
@@ -123,18 +123,18 @@ namespace clib{
     }
     return true;
   }
-  inline bool String::operator==(const char* s) const {
-    return *this == String(s);
+  inline bool Text::operator==(const char* s) const {
+    return *this == Text(s);
   }
 
-  inline bool String::operator!=(const String& s) const {
+  inline bool Text::operator!=(const Text& s) const {
     return !(*this == s);
   }
-  inline bool String::operator!=(const char* s) const {
+  inline bool Text::operator!=(const char* s) const {
     return !(*this == s);
   }
 
-  inline long long String::toInt() const {
+  inline long long Text::toInt() const {
     if(size() == 0 || (size() == 1 && l[0] == '-'))
       throw std::invalid_argument("Not an integer");
     
@@ -157,10 +157,10 @@ namespace clib{
     return r * sign;
   }
 
-  inline String String::fromInt(long long i) {
+  inline Text Text::fromInt(long long i) {
     if(i == 0) return "0";
 
-    String r;
+    Text r;
     bool neg = i < 0;
     if(neg) i = -i;
 
@@ -175,9 +175,9 @@ namespace clib{
     return r;
   }
 
-  inline List<String> String::split(char c) const {
-    List<String> out;
-    String temp;
+  inline darray<Text> Text::split(char c) const {
+    darray<Text> out;
+    Text temp;
     std::size_t stringLength = size();
     for(std::size_t i = 0; i < stringLength; i ++) {
       if(l[i] == c) {
@@ -192,23 +192,23 @@ namespace clib{
     return out;
   }
 
-  inline String& String::insert(std::size_t at, char c) {
+  inline Text& Text::insert(std::size_t at, char c) {
     l.insert(at, c);
     return *this;
   }
 
-  inline std::ostream& operator<<(std::ostream& stream, const String& s) {
+  inline std::ostream& operator<<(std::ostream& stream, const Text& s) {
     for(std::size_t i = 0; i < s.size(); i ++) {
       stream << s[i];
     }
     return stream;
   }
 
-  inline bool operator==(const char* sraw, const String& s) {
+  inline bool operator==(const char* sraw, const Text& s) {
     return s == sraw;
   }
 
-  inline std::istream& operator>>(std::istream& stream, String& s) {
+  inline std::istream& operator>>(std::istream& stream, Text& s) {
     s.clear();
 
     char c;
@@ -221,11 +221,11 @@ namespace clib{
     return stream;
   }
 
-  inline const char* String::raw() const{
+  inline const char* Text::raw() const{
     return l.size() ? &l[0] : "";
   }
 
-  inline std::istream& getLine(std::istream& stream, clib::String& s, char delim = '\n') {
+  inline std::istream& getLine(std::istream& stream, clib::Text& s, char delim = '\n') {
     s.clear();
     char c;
     while(stream.get(c)) {

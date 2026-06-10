@@ -7,29 +7,29 @@
 namespace clib {
 
   template<typename T>
-  class List {
+  class darray {
 
     public:
       /*Since move_if_noexcept is forbidden, convetion
        *is that moving objects is well-defined and is noexcept for all types.*/
-      List();
-      List(const T* arr, std::size_t len);
-      ~List();
+      darray();
+      darray(const T* arr, std::size_t len);
+      ~darray();
 
-      List& add(const T& item);
+      darray& add(const T& item);
 
-      List(const List& l);
-      List& operator=(const List& l);
-      List(List&& l) noexcept;
-      List& operator=(List&& l) noexcept;
+      darray(const darray& l);
+      darray& operator=(const darray& l);
+      darray(darray&& l) noexcept;
+      darray& operator=(darray&& l) noexcept;
 
       T& operator[](std::size_t index);
       const T& operator[](std::size_t index) const;
 
-      void extend(const List<T>& list);
+      void extend(const darray<T>& list);
       void clear();
-      List& remove(std::size_t st, std::size_t items = 1);
-      List& insert(std::size_t at, const T& item);
+      darray& remove(std::size_t st, std::size_t items = 1);
+      darray& insert(std::size_t at, const T& item);
       T pop();
       bool contains(const T& item) const;
       std::size_t size() const;
@@ -66,22 +66,22 @@ namespace clib {
   //-------DEFINITIONS------
 
   template<typename T>
-  void List<T>::clear() {
+  void darray<T>::clear() {
     clear_data();
   }
 
   template<typename T>
-  void List<T>::delete_data() {
+  void darray<T>::delete_data() {
     ::operator delete(data);
     data = nullptr;
   }
 
   template<typename T>
-  T* List<T>::construct_data(std::size_t size) {
+  T* darray<T>::construct_data(std::size_t size) {
     return static_cast<T*>(::operator new(sizeof(T) * size));
   }
   template<typename T>
-  void List<T>::clear_data(std::size_t st) {
+  void darray<T>::clear_data(std::size_t st) {
     if(st >= count) return;
 
     for(std::size_t i = st; i < count; i ++) {
@@ -91,7 +91,7 @@ namespace clib {
   }
 
   template<typename T>
-  void List<T>::reserve(std::size_t space) {
+  void darray<T>::reserve(std::size_t space) {
 
     if(space <= cap) return;
 
@@ -111,12 +111,12 @@ namespace clib {
   }
 
   template<typename T>
-  void List<T>::expand() {
+  void darray<T>::expand() {
     reserve(cap == 0 ? 1 : cap * 2);
   }
 
   template<typename T>
-  List<T>::List(const T* arr, std::size_t len) {
+  darray<T>::darray(const T* arr, std::size_t len) {
     reserve(len);
     
     for(std::size_t i = 0; i < len; i ++) {
@@ -127,16 +127,16 @@ namespace clib {
   }
 
   template<typename T>
-  List<T>::List() {}
+  darray<T>::darray() {}
 
   template<typename T>
-  List<T>::~List() {
+  darray<T>::~darray() {
     clear_data();
     delete_data();
   }
 
   template<typename T>
-  List<T>& List<T>::add(const T& item) {
+  darray<T>& darray<T>::add(const T& item) {
     if(full()) expand();
 
     new (data + count) T(item);
@@ -146,19 +146,19 @@ namespace clib {
   }
 
   template<typename T>
-  void List<T>::extend(const List<T>& list) {
+  void darray<T>::extend(const darray<T>& list) {
 
-    List<T> temp(*this);
+    darray<T> temp(*this);
     temp.reserve(count + list.size());
     for(std::size_t i = 0; i < list.size(); i ++){
       new (temp.data + temp.count) T(list[i]);
       temp.count ++;
     }
-    *this = static_cast<List<T>&&>(temp);
+    *this = static_cast<darray<T>&&>(temp);
  };
 
   template<typename T>
-  List<T>::List(const List& l) {
+  darray<T>::darray(const darray& l) {
     reserve(l.cap);
     count = l.count;
     for(std::size_t i = 0; i < l.count; i ++) {
@@ -166,7 +166,7 @@ namespace clib {
     }
   }
   template<typename T>
-  List<T>& List<T>::operator=(const List& l) {
+  darray<T>& darray<T>::operator=(const darray& l) {
     if(&l == this) return *this;
 
     clear_data();
@@ -180,7 +180,7 @@ namespace clib {
   }
 
   template<typename T>
-  List<T>::List(List&& l) noexcept{
+  darray<T>::darray(darray&& l) noexcept{
     data = l.data;
     count = l.count;
     cap = l.cap;
@@ -190,7 +190,7 @@ namespace clib {
   }
 
   template<typename T>
-  List<T>& List<T>::remove(std::size_t st, std::size_t items) {
+  darray<T>& darray<T>::remove(std::size_t st, std::size_t items) {
     if(st >= count || items == 0 || items > count - st) return *this;
     
     for(std::size_t i = st; i < count - items; i ++) {
@@ -202,7 +202,7 @@ namespace clib {
   }
 
   template<typename T>
-  List<T>& List<T>::insert(std::size_t at, const T& item) { 
+  darray<T>& darray<T>::insert(std::size_t at, const T& item) { 
     if(at == count) return add(item);
 
     if(!indexInBounds(at)) throw std::out_of_range("insert: index out of bounds");
@@ -220,7 +220,7 @@ namespace clib {
   }
 
   template<typename T>
-    T List<T>::pop() {
+    T darray<T>::pop() {
       if(count == 0)
         throw std::out_of_range("list pop: can't pop on an empty list");
 
@@ -231,7 +231,7 @@ namespace clib {
     }
 
   template<typename T>
-  long List<T>::indexOf(const T& item) const {
+  long darray<T>::indexOf(const T& item) const {
     for(std::size_t i = 0; i < count; i ++) {
       if(data[i] == item) {
         return i;
@@ -241,7 +241,7 @@ namespace clib {
   }
 
   template<typename T>
-  List<T>& List<T>::operator=(List&& l) noexcept{
+  darray<T>& darray<T>::operator=(darray&& l) noexcept{
     if(this == &l) return *this;
 
     clear_data();
@@ -259,7 +259,7 @@ namespace clib {
   }
 
   template<typename T>
-  T& List<T>::operator[](std::size_t index) {
+  T& darray<T>::operator[](std::size_t index) {
     if(indexInBounds(index)) {
         return data[index];
     }
@@ -267,7 +267,7 @@ namespace clib {
   }
 
   template<typename T>
-  const T& List<T>::operator[](std::size_t index) const{
+  const T& darray<T>::operator[](std::size_t index) const{
     if(indexInBounds(index)) {
         return data[index];
     }
@@ -276,7 +276,7 @@ namespace clib {
 
 
   template<typename T>
-  bool List<T>::contains(const T& item) const {
+  bool darray<T>::contains(const T& item) const {
     for(std::size_t i = 0; i < count; i ++) {
       if(data[i] == item) return true;
     }
@@ -284,38 +284,38 @@ namespace clib {
   }
 
   template<typename T>
-  std::size_t List<T>::size() const{
+  std::size_t darray<T>::size() const{
     return count;
   }
 
   template<typename T>
-  bool List<T>::indexInBounds(std::size_t index) const {
+  bool darray<T>::indexInBounds(std::size_t index) const {
     return index < count;
   }
 
   template<typename T>
-  bool List<T>::full() const {
+  bool darray<T>::full() const {
     return cap == count;
   }
 
   template<typename T>
-  bool List<T>::empty() const {
+  bool darray<T>::empty() const {
     return count == 0;
   }
   template<typename T>
-  T* List<T>::begin() {
+  T* darray<T>::begin() {
     return data;
   }
   template<typename T>
-  T* List<T>::end() {
+  T* darray<T>::end() {
     return data + count;
   }
   template<typename T>
-  const T* List<T>::begin() const {
+  const T* darray<T>::begin() const {
     return data;
   }
   template<typename T>
-  const T* List<T>::end() const {
+  const T* darray<T>::end() const {
     return data + count;
   }
 

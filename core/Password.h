@@ -1,6 +1,6 @@
 #pragma once
 
-#include"../utils/string.h"
+#include"../utils/mystring.h"
 #include"./PasswordView.h"
 #include"../encrypt/Cipher.h"
 #include"../encrypt/CipherTypeUtils.h"
@@ -11,9 +11,9 @@ namespace core {
       PasswordEntry();
       ~PasswordEntry();
       PasswordEntry(
-          const clib::String& website,
-          const clib::String& username,
-          const clib::String& passwordEncrypted,
+          const clib::Text& website,
+          const clib::Text& username,
+          const clib::Text& passwordEncrypted,
           encrypt::Cipher* cipher
       );
       PasswordEntry(const PasswordEntry& p);
@@ -22,14 +22,14 @@ namespace core {
       PasswordEntry& operator=(PasswordEntry&& p);
 
       bool operator==(const PasswordEntry& p) const;
-      void setUsername(const clib::String& username);
-      void setWebsite(const clib::String& website);
-      void setPassword(const clib::String& passwordEncrypted);
-      clib::String getPasswordEncrypted() const;
+      void setUsername(const clib::Text& username);
+      void setWebsite(const clib::Text& website);
+      void setPassword(const clib::Text& passwordEncrypted);
+      clib::Text getPasswordEncrypted() const;
       const encrypt::Cipher* getCipher() const;
-      clib::String serialize() const override;
+      clib::Text serialize() const override;
     private:
-      clib::String passwordEncrypted;
+      clib::Text passwordEncrypted;
       encrypt::Cipher* cipher;
   };
 

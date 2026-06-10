@@ -8,22 +8,22 @@ namespace core {
   }
 
   PasswordEntry::PasswordEntry(
-      const clib::String& website,
-      const clib::String& username,
-      const clib::String& passwordEncrypted,
+      const clib::Text& website,
+      const clib::Text& username,
+      const clib::Text& passwordEncrypted,
       encrypt::Cipher* cipher
   ): PasswordView(website, username), passwordEncrypted(passwordEncrypted),cipher(cipher) {};
 
-  void PasswordEntry::setUsername(const clib::String& username) {
+  void PasswordEntry::setUsername(const clib::Text& username) {
     this->username = username;
   }
-  void PasswordEntry::setWebsite(const clib::String& website) {
+  void PasswordEntry::setWebsite(const clib::Text& website) {
     this->website = website;
   }
-  void PasswordEntry::setPassword(const clib::String& passwordEncrypted) {
+  void PasswordEntry::setPassword(const clib::Text& passwordEncrypted) {
     this->passwordEncrypted = passwordEncrypted;
   }
-  clib::String PasswordEntry::getPasswordEncrypted() const {
+  clib::Text PasswordEntry::getPasswordEncrypted() const {
     return passwordEncrypted;
   }
   const encrypt::Cipher* PasswordEntry::getCipher() const {
@@ -79,7 +79,7 @@ namespace core {
     return website == p.website && username == p.username;
   };
 
-  clib::String PasswordEntry::serialize() const {
+  clib::Text PasswordEntry::serialize() const {
     return 
       website + "\t" + username + "\t" + passwordEncrypted
         + "\t" + cipher->type() + "\t" + cipher->serialize();

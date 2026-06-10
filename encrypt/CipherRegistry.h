@@ -1,7 +1,7 @@
 #pragma once
 
-#include"../utils/array.h"
-#include"../utils/string.h"
+#include"../utils/darray.h"
+#include"../utils/mystring.h"
 #include"Cipher.h"
 #include"CipherFactory.h"
 
@@ -9,14 +9,14 @@ namespace encrypt {
 
   class CipherRegistry {
   private:
-    clib::List<CipherFactory*> list;
+    clib::darray<CipherFactory*> list;
 
     void add(CipherFactory* cf);
   public:
     CipherRegistry();
     ~CipherRegistry();
 
-    const CipherFactory* byType(clib::String type) const;
+    const CipherFactory* byType(clib::Text type) const;
 
     CipherRegistry(const CipherRegistry&) = delete;
     CipherRegistry& operator=(const CipherRegistry&) = delete;
@@ -25,7 +25,7 @@ namespace encrypt {
 
     static const CipherRegistry& get();
 
-    clib::List<clib::String> cipherTypes() const;
+    clib::darray<clib::Text> cipherTypes() const;
 
   };
 }

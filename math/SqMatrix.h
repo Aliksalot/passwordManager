@@ -1,6 +1,6 @@
 #pragma once
 
-#include"../utils/array.h"
+#include"../utils/darray.h"
 #include<iostream>
 #include"./RemRing.h"
 #include"../utils/exceptions.h"
@@ -13,71 +13,71 @@ namespace math {
    * Which isn't explicitly defined in the class/function name/names,
    * so that they stay shorter and easier to type out
    */
-  using DataList = clib::List<clib::List<Z26>>;
+  using Datadarray = clib::darray<clib::darray<Z26>>;
 
   class SqMatrix {
   private:
     void calculateInverse();
 
-    SqMatrix(DataList& data, DataList& inverse);
+    SqMatrix(Datadarray& data, Datadarray& inverse);
 
-    DataList data;
-    DataList inverse;
+    Datadarray data;
+    Datadarray inverse;
 
-    static clib::String dataListToReadable(const DataList& data);
-    static clib::List<Z26> applyDataList(
-      const DataList& data,
-      const clib::List<Z26>& vec
+    static clib::Text datadarrayToReadable(const Datadarray& data);
+    static clib::darray<Z26> applyDatadarray(
+      const Datadarray& data,
+      const clib::darray<Z26>& vec
     );
 
   public:
     SqMatrix() = delete;
-    SqMatrix(const DataList& data);
+    SqMatrix(const Datadarray& data);
 
-    const DataList& asList() const;
-    const DataList& inverseAsList() const;
+    const Datadarray& asdarray() const;
+    const Datadarray& inverseAsdarray() const;
 
-    clib::String toReadableString() const;
-    clib::String toReadableStringInverse() const;
+    clib::Text toReadableText() const;
+    clib::Text toReadableTextInverse() const;
 
-    clib::String serialize() const;
+    clib::Text serialize() const;
 
-    clib::List<Z26> apply(const clib::List<Z26>& vec) const;
-    clib::List<Z26> applyInverse(const clib::List<Z26>& vec) const;
+    clib::darray<Z26> apply(const clib::darray<Z26>& vec) const;
+    clib::darray<Z26> applyInverse(const clib::darray<Z26>& vec) const;
 
-    static DataList identity(unsigned dim);
-    static SqMatrix deserialize(const clib::String& raw);
+    static Datadarray identity(unsigned dim);
+    static SqMatrix deserialize(const clib::Text& raw);
   };
 
 
-  inline SqMatrix::SqMatrix(DataList& data, DataList& inverse)
+  inline SqMatrix::SqMatrix(Datadarray& data, Datadarray& inverse)
     : 
     data(
-      static_cast<DataList&&>(data)
+      static_cast<Datadarray&&>(data)
     ),
     inverse(
-      static_cast<DataList&&>(inverse)
+      static_cast<Datadarray&&>(inverse)
     ) { };
 
-  inline clib::String SqMatrix::toReadableString() const {
-    return dataListToReadable(data);
+  inline clib::Text SqMatrix::toReadableText() const {
+    return datadarrayToReadable(data);
   }
 
-  inline clib::String SqMatrix::serialize() const {
-    clib::String result;
+  inline clib::Text SqMatrix::serialize() const {
+    clib::Text result;
 
-    result += clib::String::fromInt(data.size());
+    result += clib::Text::fromInt(data.size());
     result += "&";
 
     for(auto& row: data) {
       for(auto& item: row) {
-        result += clib::String::fromInt(item.raw());
+        result += clib::Text::fromInt(item.raw());
         result += "&";
       }
     }
     for(auto& row: inverse) {
       for(auto& item: row) {
-        result += clib::String::fromInt(item.raw());
+        result += clib::Text::fromInt(item.raw());
         result += "&";
       }
     }
@@ -85,15 +85,15 @@ namespace math {
     return result;
   }
 
-  inline SqMatrix SqMatrix::deserialize(const clib::String& raw) {
-    clib::List<clib::String> tokens = raw.split('&');
+  inline SqMatrix SqMatrix::deserialize(const clib::Text& raw) {
+    clib::darray<clib::Text> tokens = raw.split('&');
     if(tokens.empty())
       throw std::runtime_error("Serialized matrix format doesn't match expected!");
 
     //Serializer appends extra &
     tokens.pop();
 
-    DataList matrix, inverse;
+    Datadarray matrix, inverse;
     std::size_t dim = tokens[0].toInt();
 
     std::size_t expectedTokenCount = 1 + 2*dim*dim;
@@ -103,8 +103,8 @@ namespace math {
     
     try{
       for(std::size_t r = 0; r < dim; r ++) {
-        matrix.add(clib::List<Z26>());
-        inverse.add(clib::List<Z26>());
+        matrix.add(clib::darray<Z26>());
+        inverse.add(clib::darray<Z26>());
         for(std::size_t c = 0; c < dim; c ++) {
           matrix[r].add(tokens[
             1 + c + (r * dim)
@@ -122,14 +122,14 @@ namespace math {
     return SqMatrix(matrix, inverse);
   }
 
-  inline clib::String SqMatrix::toReadableStringInverse() const {
-    return dataListToReadable(inverse);
+  inline clib::Text SqMatrix::toReadableTextInverse() const {
+    return datadarrayToReadable(inverse);
   }
 
-  inline DataList SqMatrix::identity(unsigned dim) {
-    DataList l;
+  inline Datadarray SqMatrix::identity(unsigned dim) {
+    Datadarray l;
     for(unsigned i = 0; i < dim; i ++) {
-      l.add(clib::List<Z26>());
+      l.add(clib::darray<Z26>());
       for(unsigned j = 0; j < dim; j ++) {
         if(i == j) { l[i].add(1); continue; }
         l[i].add(0);
@@ -138,7 +138,7 @@ namespace math {
     return l;
   }
 
-  inline SqMatrix::SqMatrix(const DataList& data): data(data) {
+  inline SqMatrix::SqMatrix(const Datadarray& data): data(data) {
     std::size_t rCount = data.size();
     for(auto& row: data) {
       //TODO custom error
@@ -148,22 +148,22 @@ namespace math {
     calculateInverse();
   }
 
-  inline const DataList& SqMatrix::asList() const {
+  inline const Datadarray& SqMatrix::asdarray() const {
     return data;
   }
-  inline const DataList& SqMatrix::inverseAsList() const {
+  inline const Datadarray& SqMatrix::inverseAsdarray() const {
     return inverse;
   }
 
   inline void SqMatrix::calculateInverse() {
 
-    DataList thisDataCopy = this->data;
+    Datadarray thisDataCopy = this->data;
 
     std::size_t dim = thisDataCopy.size();
 
-    DataList inverted = identity(dim);
+    Datadarray inverted = identity(dim);
 
-    clib::List<std::size_t> usedColumns;
+    clib::darray<std::size_t> usedColumns;
 
     for(std::size_t r = 0; r < dim; r ++) {
 
@@ -201,14 +201,14 @@ namespace math {
     this->inverse = inverted;
   }
 
-  inline clib::List<Z26> SqMatrix::applyDataList(
-    const DataList& data,
-    const clib::List<Z26>& vec
+  inline clib::darray<Z26> SqMatrix::applyDatadarray(
+    const Datadarray& data,
+    const clib::darray<Z26>& vec
   ) {
     
-    clib::List<clib::List<Z26>> vectorSplits;
+    clib::darray<clib::darray<Z26>> vectorSplits;
     for(std::size_t i = 0; i < vec.size() / data.size(); i ++) {
-      vectorSplits.add(clib::List<Z26>());
+      vectorSplits.add(clib::darray<Z26>());
       for(std::size_t j = 0; j < data.size(); j ++) {
         vectorSplits[i].add(vec[i * data.size() + j]);
       }
@@ -216,7 +216,7 @@ namespace math {
     
     std::size_t dim = data.size();
 
-    clib::List<Z26> result;
+    clib::darray<Z26> result;
     for(std::size_t split = 0; split < vec.size() / data.size(); split ++) {
       for(std::size_t row = 0; row < dim; row ++) {
         Z26 sum;
@@ -230,18 +230,18 @@ namespace math {
     return result;
   }
 
-  inline clib::List<Z26> SqMatrix::apply(const clib::List<Z26>& vec) const {
-    return applyDataList(data, vec);
+  inline clib::darray<Z26> SqMatrix::apply(const clib::darray<Z26>& vec) const {
+    return applyDatadarray(data, vec);
   }
-  inline clib::List<Z26> SqMatrix::applyInverse(const clib::List<Z26>& vec) const {
-    return applyDataList(inverse, vec);
+  inline clib::darray<Z26> SqMatrix::applyInverse(const clib::darray<Z26>& vec) const {
+    return applyDatadarray(inverse, vec);
   }
 
-  inline clib::String SqMatrix::dataListToReadable(const DataList& data)  {
-    clib::String res;
+  inline clib::Text SqMatrix::datadarrayToReadable(const Datadarray& data)  {
+    clib::Text res;
     for(auto& row: data) {
       for(auto& el: row) {
-        res += clib::String::fromInt(el.raw());
+        res += clib::Text::fromInt(el.raw());
         res += " ";
       }
       res += "\n";

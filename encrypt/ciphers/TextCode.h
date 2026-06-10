@@ -2,8 +2,8 @@
 
 #include"../Cipher.h"
 #include<fstream>
-#include"../../utils/string.h"
-#include"../../utils/array.h"
+#include"../../utils/mystring.h"
+#include"../../utils/darray.h"
 #include"../../utils/exceptions.h"
 
 #include"../CipherFactory.h"
@@ -17,31 +17,31 @@ namespace encrypt {
   class TextCode: public Cipher{
   private:
 
-    clib::String path;
+    clib::Text path;
     
     CharMap buildLetterToIndex() const;
     
-    clib::String readCipherFile() const;
+    clib::Text readCipherFile() const;
   public:
 
     TextCode() = delete;
-    TextCode(clib::String path);
+    TextCode(clib::Text path);
     TextCode(const char* path);
 
-    clib::String encrypt(const clib::String& text) const override;
-    clib::String decrypt(const clib::String& text) const override;
+    clib::Text encrypt(const clib::Text& text) const override;
+    clib::Text decrypt(const clib::Text& text) const override;
 
-    clib::String serialize() const override;
-    clib::String type() const override;
+    clib::Text serialize() const override;
+    clib::Text type() const override;
 
     TextCode* clone() const override;
   };
 
   class TextCodeFactory: public CipherFactory {
   public:
-    TextCode* fromArgs(const clib::List<clib::String>& args) const override;
+    TextCode* fromArgs(const clib::darray<clib::Text>& args) const override;
     TextCode* fromShell(gui::Shell& shell) const override;
-    clib::String type() const override;
+    clib::Text type() const override;
   };
 
 

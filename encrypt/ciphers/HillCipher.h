@@ -11,26 +11,26 @@ namespace encrypt {
   private:
     math::SqMatrix m;
   public:
-     clib::String encrypt(const clib::String& text) const override;
-     clib::String decrypt(const clib::String& text) const override;
+     clib::Text encrypt(const clib::Text& text) const override;
+     clib::Text decrypt(const clib::Text& text) const override;
 
-     clib::String serialize() const override;
-     clib::String type() const override;
+     clib::Text serialize() const override;
+     clib::Text type() const override;
 
      HillCipher* clone() const override;
 
      HillCipher() = delete;
      HillCipher(math::SqMatrix m);
 
-     static clib::List<math::Z26> toZ26(const clib::String& text);
-     static clib::String fromZ26(const clib::List<math::Z26> tokens);
+     static clib::darray<math::Z26> toZ26(const clib::Text& text);
+     static clib::Text fromZ26(const clib::darray<math::Z26> tokens);
   };
 
   class HillCipherFactory: public CipherFactory {
   public:
-    HillCipher* fromArgs(const clib::List<clib::String>& args) const override;
+    HillCipher* fromArgs(const clib::darray<clib::Text>& args) const override;
     HillCipher* fromShell(gui::Shell& shell) const override;
-    clib::String type() const override;
+    clib::Text type() const override;
   };
 
 }

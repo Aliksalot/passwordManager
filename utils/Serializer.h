@@ -10,15 +10,15 @@
 namespace utils {
   class Serializer {
   public:
-    static clib::List<core::PasswordEntry> deserializePasswords (const clib::String& raw) {
+    static clib::darray<core::PasswordEntry> deserializePasswords (const clib::Text& raw) {
       return deserializePasswords(raw.split('\n'));
     }
 
-    static clib::List<core::PasswordEntry> deserializePasswords (
-        const clib::List<clib::String>& lines
+    static clib::darray<core::PasswordEntry> deserializePasswords (
+        const clib::darray<clib::Text>& lines
     ) {
 
-      clib::List<core::PasswordEntry> l;
+      clib::darray<core::PasswordEntry> l;
       for(std::size_t i = 0; i < lines.size(); i ++) {
 
         if(lines[i].empty()) continue;
@@ -30,7 +30,7 @@ namespace utils {
         if(line.size() < 4) 
           throw std::invalid_argument("File possibly corrupted, line format is invalid!");
 
-        clib::List<clib::String> cipherArguments;
+        clib::darray<clib::Text> cipherArguments;
         for(std::size_t j = 4; j < line.size(); j ++) {
           cipherArguments.add(line[j]);
         }
@@ -46,8 +46,8 @@ namespace utils {
 
       return l;
     }
-    static clib::String serializePasswords (const clib::List<core::PasswordEntry>& data) {
-      clib::String result;
+    static clib::Text serializePasswords (const clib::darray<core::PasswordEntry>& data) {
+      clib::Text result;
       std::size_t passCount = data.size();
       for(std::size_t i = 0; i < passCount; i ++) {
         result += data[i].serialize();
@@ -55,17 +55,17 @@ namespace utils {
       }
       return result;
     }
-    static clib::String serializeCipher (const encrypt::Cipher* c) {
+    static clib::Text serializeCipher (const encrypt::Cipher* c) {
       return c->type() + "\t" + c->serialize();
     }
 
-    static encrypt::Cipher* deserializeCipher (const clib::String& raw) {
-      clib::List<clib::String> words = raw.split('\t');
+    static encrypt::Cipher* deserializeCipher (const clib::Text& raw) {
+      clib::darray<clib::Text> words = raw.split('\t');
       if(words.size() == 0)
         throw utils::EncryptionError("File possibly corrupted");
 
-      clib::String type = words[0];
-      clib::List<clib::String> args;
+      clib::Text type = words[0];
+      clib::darray<clib::Text> args;
       for(std::size_t i = 1; i < words.size(); i ++) {
         args.add(words[i]);
       }

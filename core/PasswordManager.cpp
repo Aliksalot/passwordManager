@@ -15,16 +15,16 @@ namespace core {
   }
 
   void PasswordManager::createFile(
-    const clib::String& fname,
+    const clib::Text& fname,
     encrypt::Cipher* defaultCipher,
-    const clib::String& password
+    const clib::Text& password
   ) {
     PasswordFile f(fname);
     
     f.createFile(defaultCipher, password);
   }
 
-  void PasswordManager::openFile(const clib::String& fname, const clib::String& password) {
+  void PasswordManager::openFile(const clib::Text& fname, const clib::Text& password) {
     
     try{
       if(currentFile != nullptr) {
@@ -40,7 +40,7 @@ namespace core {
     }
   }
 
-  clib::String PasswordManager::getFilePath() const {
+  clib::Text PasswordManager::getFilePath() const {
     checkFileOpenOrThrow();
 
     return currentFile->getPath();
@@ -62,15 +62,15 @@ namespace core {
     return currentFile->hasUnsavedData();
   }
 
-  void PasswordManager::saveFile(const clib::String& password) {
+  void PasswordManager::saveFile(const clib::Text& password) {
     checkFileOpenOrThrow();
 
     currentFile->save(password);
   }
 
-  clib::List<const PasswordEntry*> PasswordManager::loadPassword(
-    const clib::String& website,
-    const clib::String& user
+  clib::darray<const PasswordEntry*> PasswordManager::loadPassword(
+    const clib::Text& website,
+    const clib::Text& user
   ) const {
     checkFileOpenOrThrow();
 
@@ -78,9 +78,9 @@ namespace core {
   }
 
   void PasswordManager::updatePassword(
-    const clib::String& website,
-    const clib::String& user,
-    const clib::String& newPassword
+    const clib::Text& website,
+    const clib::Text& user,
+    const clib::Text& newPassword
   ) {
     checkFileOpenOrThrow();
 
@@ -88,9 +88,9 @@ namespace core {
   }
 
   bool PasswordManager::newPassword(
-    const clib::String& website,
-    const clib::String& user,
-    const clib::String& newPassword,
+    const clib::Text& website,
+    const clib::Text& user,
+    const clib::Text& newPassword,
     encrypt::Cipher* cipher
   ) {
     checkFileOpenOrThrow();
@@ -110,19 +110,19 @@ namespace core {
 
 
   void PasswordManager::deletePassword(
-    const clib::String& website,
-    const clib::String& user
+    const clib::Text& website,
+    const clib::Text& user
   ) {
     checkFileOpenOrThrow();
 
     currentFile->remove(website, user);
   }
   
-  clib::List<const PasswordView*> PasswordManager::list() const {
+  clib::darray<const PasswordView*> PasswordManager::list() const {
     checkFileOpenOrThrow();
 
     auto plist = currentFile->find();
-    clib::List<const PasswordView*> viewList;
+    clib::darray<const PasswordView*> viewList;
     for(auto& pEntry: plist) {
       viewList.add(pEntry);
     }

@@ -1,16 +1,16 @@
 #include"PasswordView.h"
 
 namespace core {
-  clib::String PasswordView::getWebsite() const {
+  clib::Text PasswordView::getWebsite() const {
     return website;
   }
-  clib::String PasswordView::getUsername() const {
+  clib::Text PasswordView::getUsername() const {
     return username;
   }
-  PasswordView::PasswordView(const clib::String& website, const clib::String& username)
+  PasswordView::PasswordView(const clib::Text& website, const clib::Text& username)
     : website(website), username(username) { };
 
-  clib::String PasswordView::serialize() const {
+  clib::Text PasswordView::serialize() const {
     return website + "\t" + username;
   }
 }

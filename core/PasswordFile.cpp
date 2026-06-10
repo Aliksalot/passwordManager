@@ -5,21 +5,21 @@ namespace core {
     delete defaultCipher;
   }
 
-  PasswordFile::PasswordFile(clib::String path): path(path) {};
+  PasswordFile::PasswordFile(clib::Text path): path(path) {};
 
   const encrypt::Cipher* PasswordFile::getDefaultCipher() const {
     return defaultCipher;
   }
 
-  clib::String PasswordFile::getPath() const {
+  clib::Text PasswordFile::getPath() const {
     return path;
   }
 
-  clib::List<const PasswordEntry*> PasswordFile::find(
-      const clib::String& website,
-      const clib::String& user
+  clib::darray<const PasswordEntry*> PasswordFile::find(
+      const clib::Text& website,
+      const clib::Text& user
   ) const {
-    clib::List<const PasswordEntry*> r;
+    clib::darray<const PasswordEntry*> r;
     for(std::size_t i = 0; i < passwords.size(); i ++) {
       bool websiteMatch = website.empty() || website == passwords[i].getWebsite();
       bool userMatch = user.empty() || user == passwords[i].getUsername();
@@ -30,8 +30,8 @@ namespace core {
   }
 
   PasswordFile& PasswordFile::remove(
-      const clib::String& website,
-      const clib::String& user
+      const clib::Text& website,
+      const clib::Text& user
   ) {
     for(std::size_t i = 0; i < passwords.size(); ) {
       bool websiteMatch = website.empty() || website == passwords[i].getWebsite();
@@ -48,9 +48,9 @@ namespace core {
 
 
   PasswordFile& PasswordFile::add(
-    const clib::String& website,
-    const clib::String& username,
-    const clib::String& password,
+    const clib::Text& website,
+    const clib::Text& username,
+    const clib::Text& password,
     encrypt::Cipher* cipher
   ) {
     if(defaultCipher == nullptr)
@@ -79,9 +79,9 @@ namespace core {
     return *this;
   }
   PasswordFile& PasswordFile::update(
-    const clib::String& website,
-    const clib::String& username,
-    const clib::String& password
+    const clib::Text& website,
+    const clib::Text& username,
+    const clib::Text& password
   ) {
 
     bool foundMatch = false;
@@ -108,7 +108,7 @@ namespace core {
 
   void PasswordFile::createFile(
     encrypt::Cipher* cipher,
-    const clib::String& password
+    const clib::Text& password
   ) {
 
     delete defaultCipher;
@@ -122,7 +122,7 @@ namespace core {
     save(password);
   }
 
-  void PasswordFile::save(const clib::String& password) {
+  void PasswordFile::save(const clib::Text& password) {
 
     if(!defaultCipher)
       throw utils::FileError("Error when saving file - defaultCipher is missing \
@@ -133,24 +133,24 @@ namespace core {
     if(!file)
       throw utils::FileError("Error when opening file for saving. Possibly missing");
 
-    clib::String content;
+    clib::Text content;
 
     content += utils::Serializer::serializeCipher(defaultCipher) + "\n";
     content += utils::Serializer::serializePasswords(passwords);
 
-    clib::String encryptedPasswords = utils::encryptFile(content, password);
+    clib::Text encryptedPasswords = utils::encryptFile(content, password);
     file.write(encryptedPasswords.raw(), encryptedPasswords.size());
 
     hasUnsaved = false;
   }
 
-  void PasswordFile::load(const clib::String& password) {
+  void PasswordFile::load(const clib::Text& password) {
     std::ifstream file(path.raw(), std::ios::binary);
 
     if(!file)
       throw utils::FileError("Possibly missing file");
 
-    clib::String content;
+    clib::Text content;
     char c;
 
     while(file.get(c)) {
@@ -159,7 +159,7 @@ namespace core {
 
     content = utils::decryptFile(content, password);
 
-    clib::List<clib::String> lines = content.split('\n');
+    clib::darray<clib::Text> lines = content.split('\n');
 
     if(lines.size() == 0)
       throw utils::EncryptionError();
