@@ -1,7 +1,8 @@
 #pragma once
 
-#include<cstddef>
+#include<cstdlib>
 #include<stdexcept>
+#include"memory.h"
 
 namespace clib {
 
@@ -9,6 +10,8 @@ namespace clib {
   class List {
 
     public:
+      /*Since move_if_noexcept is forbidden, convetion
+       *is that moving objects is well-defined and is noexcept for all types.*/
       List();
       List(const T* arr, std::size_t len);
       ~List();
@@ -49,7 +52,6 @@ namespace clib {
       bool indexInBounds(std::size_t index) const;
       bool full() const;
 
-      //TODO abstract memory management
       /**Destroys all objects in data and sets count to 0. Doesn't delete data*/
       void clear_data(std::size_t st = 0);
       /**Calls delete on data. Does NOT destruct T objects, only frees memory*/
@@ -97,7 +99,7 @@ namespace clib {
     std::size_t tempCount = count;
 
     for(std::size_t i = 0; i < count; i ++) {
-      new (temp + i) T(std::move_if_noexcept(data[i]));
+      new (temp + i) T(static_cast<T&&>(data[i]));
     }
 
     clear_data();
@@ -143,15 +145,17 @@ namespace clib {
     return *this;
   }
 
-  //TODO Try/catch and implement rollback
   template<typename T>
   void List<T>::extend(const List<T>& list) {
-    reserve(count + list.size());
+
+    List<T> temp(*this);
+    temp.reserve(count + list.size());
     for(std::size_t i = 0; i < list.size(); i ++){
-      new (data + count) T(list[i]);
-      count ++;
+      new (temp.data + temp.count) T(list[i]);
+      temp.count ++;
     }
-  };
+    *this = static_cast<T&&>(temp);
+ };
 
   template<typename T>
   List<T>::List(const List& l) {
@@ -190,7 +194,7 @@ namespace clib {
     if(st >= count || items == 0 || items > count - st) return *this;
     
     for(std::size_t i = st; i < count - items; i ++) {
-      data[i] = std::move(data[items + i]);
+      data[i] = static_cast<T&&>(data[items + i]);
     }
 
     clear_data(count - items);
@@ -205,11 +209,11 @@ namespace clib {
 
     if(full()) expand();
     
-    for(std::size_t i = count; i > at; i --) {
-      data[i] = std::move(data[i-1]);
+    new (data + count) T(static_cast<T&&>(data[count - 1]));
+    for(std::size_t i = count - 1; i > at; i --) {
+      data[i] = static_cast<T&&>(data[i-1]);
     }
-    
-    new (data + at) T(item);
+    data[at] = item;
     count ++;
 
     return *this;
@@ -217,7 +221,10 @@ namespace clib {
 
   template<typename T>
     T List<T>::pop() {
-      T temp = std::move(data[count - 1]);
+      if(count == 0)
+        throw std::out_of_range("list pop: can't pop on an empty list");
+
+      T temp = static_cast<T&&>(data[count - 1]);
       clear_data(count - 1);
 
       return temp;
@@ -311,7 +318,6 @@ namespace clib {
   const T* List<T>::end() const {
     return data + count;
   }
-
 
 }
 

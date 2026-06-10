@@ -159,7 +159,6 @@ namespace clib{
     return r;
   }
 
-  //TODO pretty heavy, if time allows fix it
   inline List<String> String::split(char c) const {
     List<String> out;
     String temp;
@@ -187,6 +186,10 @@ namespace clib{
       stream << s[i];
     }
     return stream;
+  }
+
+  inline bool operator==(const char* sraw, const String& s) {
+    return s == sraw;
   }
 
   inline std::istream& operator>>(std::istream& stream, String& s) {

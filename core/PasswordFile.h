@@ -18,6 +18,7 @@ namespace core{
     ~PasswordFile();
 
     const encrypt::Cipher* getDefaultCipher() const;
+    clib::String getPath() const;
     clib::List<const PasswordEntry*> find(
       const clib::String& website = "",
       const clib::String& user = ""

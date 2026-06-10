@@ -13,22 +13,26 @@ namespace gui {
   private:
     core::PasswordManager pm;
 
-    bool promptSave();
-
-    static std::istream& in();
-    static void print(const clib::String& s);
-    static void print_line(const clib::String& s, char eol = '\n');
+    bool promptConfirm();
+    
+    static const clib::String commandUsage(const clib::String& cmd);
   public:
     Shell();
+
     void open(const TokenList& t);
     void create(const TokenList& t);
     void close();
+    void save_file();
     void save(const TokenList& t);
     void load(const TokenList& t);
     void update(const TokenList& t);
-    void remove(const TokenList& t);
-    void list(const TokenList& t);
-    void exit(const TokenList& t);
-    void help();
+    void entryDelete(const TokenList& t);
+    void list() const;
+    void help() const;
+    void listCiphers() const;
+
+    void print(const clib::String& s) const;
+    void print_line(clib::String s, char eol = '\n') const;
+    std::istream& in();
   };
 }

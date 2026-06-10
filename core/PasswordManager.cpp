@@ -4,7 +4,7 @@
 namespace core {
 
   void PasswordManager::checkFileOpenOrThrow() const {
-    if(currentFile == nullptr)
+    if(!hasOpenFile())
       throw utils::NoFileOpenError();
   }
 
@@ -25,18 +25,30 @@ namespace core {
   }
 
   void PasswordManager::openFile(const clib::String& fname, const clib::String& password) {
-    checkFileOpenOrThrow();
     
     try{
+      if(currentFile != nullptr) {
+        std::cout << "Opening a new file atop of another! Should be unreachable by users" << std::endl;
+        delete currentFile;
+      }
       currentFile = new PasswordFile(fname);
       currentFile->load(password);
       this->password = password;
     }catch(...) {
       delete currentFile;
+      currentFile = nullptr;
       throw;
     }
   }
-  
+
+  clib::String PasswordManager::getFilePath() const {
+    checkFileOpenOrThrow();
+
+    return currentFile->getPath();
+  }
+  bool PasswordManager::hasOpenFile() const {
+    return currentFile != nullptr;
+  }
 
   void PasswordManager::closeFile() {
     checkFileOpenOrThrow();
@@ -77,6 +89,27 @@ namespace core {
 
     currentFile->update(website, user, newPassword);
   }
+
+  bool PasswordManager::newPassword(
+    const clib::String& website,
+    const clib::String& user,
+    const clib::String& newPassword,
+    encrypt::Cipher* cipher
+  ) {
+    checkFileOpenOrThrow();
+
+    try{
+      currentFile->add(website, user, newPassword, cipher);
+    }catch(const utils::FileError& e) {
+      std::cout << e.what() << std::endl;
+      return false;
+    }catch(...) {
+      return false;
+    }
+
+    return true;
+  }
+
 
   void PasswordManager::deletePassword(
     const clib::String& website,

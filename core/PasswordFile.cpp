@@ -11,6 +11,10 @@ namespace core {
     return defaultCipher;
   }
 
+  clib::String PasswordFile::getPath() const {
+    return path;
+  }
+
   clib::List<const PasswordEntry*> PasswordFile::find(
       const clib::String& website,
       const clib::String& user
@@ -156,10 +160,6 @@ namespace core {
     content = utils::FileEncrypt::decrypt(content, password);
 
     clib::List<clib::String> lines = content.split('\n');
-
-    for(auto& line: lines) {
-      std::cout << line << std::endl;
-    }
 
     if(lines.size() == 0)
       throw utils::EncryptionError();

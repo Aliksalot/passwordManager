@@ -12,7 +12,7 @@ namespace core {
       const clib::String& username,
       const clib::String& passwordEncrypted,
       encrypt::Cipher* cipher
-  ): website(website),username(username), passwordEncrypted(passwordEncrypted),cipher(cipher) {};
+  ): PasswordView(website, username), passwordEncrypted(passwordEncrypted),cipher(cipher) {};
 
   void PasswordEntry::setUsername(const clib::String& username) {
     this->username = username;
@@ -31,14 +31,12 @@ namespace core {
   }
   
   PasswordEntry::PasswordEntry(const PasswordEntry& p):
-    website(p.website),
-    username(p.username),
+    PasswordView(p.website, p.username),
     passwordEncrypted(p.passwordEncrypted),
     cipher(p.cipher->clone())
   { }
   PasswordEntry::PasswordEntry(PasswordEntry&& p):
-    website(p.website),
-    username(p.username),
+    PasswordView(p.website, p.username),
     passwordEncrypted(p.passwordEncrypted)
   { 
     p.website = "";

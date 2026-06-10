@@ -12,8 +12,7 @@
 #include<iostream>
 
 namespace core{
-  
-  /*Called needs to handle utils::NoFileOpenError by convention*/
+
   class PasswordManager {
   private:
     PasswordFile* currentFile = nullptr;
@@ -46,7 +45,18 @@ namespace core{
       const clib::String& newPassword
     );
 
+    bool newPassword(
+      const clib::String& website,
+      const clib::String& user,
+      const clib::String& newPassword,
+      encrypt::Cipher* cipher = nullptr
+    );
+
     void deletePassword(const clib::String& website, const clib::String& user = "");
+
+    bool hasOpenFile() const;
+  
+    clib::String getFilePath() const;
     
     clib::List<const PasswordView*> list() const;
 

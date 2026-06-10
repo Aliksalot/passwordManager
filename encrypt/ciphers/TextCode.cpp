@@ -80,6 +80,8 @@ namespace encrypt {
   }
   TextCode* TextCodeFactory::fromCin() const {
 
+    std::cout << "Provide a file, with which to encrypt your password(s): " << std::endl;
+
     clib::String fpath;
     char c = 0;
 

@@ -9,10 +9,45 @@
 #include"./math/RemRing.h"
 #include"./math/SqMatrix.h"
 
-using namespace clib;
+#include"./gui/Shell.h"
 
-int main(void) {
-  
+void run() {
+  char lineRaw[1024];
+  gui::Shell shell;
+
+  shell.print_line("Welcome to password manager. If you are new type \"help\" for  a list of commands.");
+  while(1) {
+    shell.in().getline(lineRaw, 1024);
+
+    clib::String line = lineRaw;
+    
+    clib::List<clib::String> tokens = line.split(' ');
+    clib::String cmd = tokens[0];
+    tokens.remove(0);
+
+    if(cmd == "open") shell.open(tokens);
+    else if(cmd == "create") shell.create(tokens);
+    else if(cmd == "close") shell.close();
+    else if(cmd == "save_file") shell.save_file();
+    else if(cmd == "save") shell.save(tokens);
+    else if(cmd == "load") shell.load(tokens);
+    else if(cmd == "update") shell.update(tokens);
+    else if(cmd == "delete") shell.entryDelete(tokens);
+    else if(cmd == "list") shell.list();
+    else if(cmd == "ciphers") shell.listCiphers();
+    else if(cmd == "exit") { 
+      shell.close();
+      shell.print_line("Goodbye!");
+      break;
+    }
+    else if(cmd == "help") shell.help();
+    else {
+      shell.print_line("Invalid command. Check \"help\" for a list of commands");
+    }
+  }
+}
+
+void test() {
   core::PasswordFile f("myfilexd");
   
   f.createFile(
@@ -50,6 +85,10 @@ int main(void) {
   }catch(const utils::FileError& e) {
     std::cout << e.what() << std::endl;
   }
+}
+
+int main(void) {
+  run();
 
   return 0;
 }

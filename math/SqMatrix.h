@@ -71,7 +71,6 @@ namespace math {
     for(auto& row: data) {
       for(auto& item: row) {
         result += clib::String::fromInt(item.raw());
-        std::cout << clib::String::fromInt(item.raw());
         result += "&";
       }
     }

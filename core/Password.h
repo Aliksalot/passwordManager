@@ -27,11 +27,8 @@ namespace core {
       void setPassword(const clib::String& passwordEncrypted);
       clib::String getPasswordEncrypted() const;
       const encrypt::Cipher* getCipher() const;
-      clib::String serialize() const;
-
+      clib::String serialize() const override;
     private:
-      clib::String website;
-      clib::String username;
       clib::String passwordEncrypted;
       encrypt::Cipher* cipher;
   };
