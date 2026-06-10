@@ -2,6 +2,7 @@
 
 #include"../utils/string.h"
 #include"../utils/array.h"
+#include"./Command.h"
 
 #include"../core/PasswordManager.h"
 
@@ -12,24 +13,14 @@ namespace gui {
   class Shell {
   private:
     core::PasswordManager pm;
+    
+    clib::List<Command> commands;
 
     bool promptConfirm();
-    
-    static const clib::String commandUsage(const clib::String& cmd);
   public:
     Shell();
 
-    void open(const TokenList& t);
-    void create(const TokenList& t);
-    void close();
-    void save_file();
-    void save(const TokenList& t);
-    void load(const TokenList& t);
-    void update(const TokenList& t);
-    void entryDelete(const TokenList& t);
-    void list() const;
-    void help() const;
-    void listCiphers() const;
+    bool execute(const clib::String& cmd, const TokenList& t);
 
     void print(const clib::String& s) const;
     void print_line(clib::String s, char eol = '\n') const;

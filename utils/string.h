@@ -30,6 +30,7 @@ namespace clib{
     static String fromInt(long long i);
 
     String& insert(std::size_t at, char c);
+    String& trim(char c);
 
     List<String> split(char c) const;
 
@@ -43,6 +44,21 @@ namespace clib{
   private:
     List<char> l;
   };
+
+  inline String& String::trim(char c) {
+    l.pop();
+
+    while(!l.empty() && l[0] == c) {
+      l.remove(0);
+    }
+
+    while(!l.empty() && *l.end() == c) {
+      l.remove(l.size() - 1);
+    }
+
+    l.add('\0');
+    return *this;
+  }
 
   inline void String::clear() {
     l.clear();

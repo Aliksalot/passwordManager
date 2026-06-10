@@ -20,28 +20,16 @@ void run() {
     shell.in().getline(lineRaw, 1024);
 
     clib::String line = lineRaw;
-    
+
+    line.trim(' ');
+
     clib::List<clib::String> tokens = line.split(' ');
+
+    if(tokens.empty()) continue;
     clib::String cmd = tokens[0];
     tokens.remove(0);
 
-    if(cmd == "open") shell.open(tokens);
-    else if(cmd == "create") shell.create(tokens);
-    else if(cmd == "close") shell.close();
-    else if(cmd == "save_file") shell.save_file();
-    else if(cmd == "save") shell.save(tokens);
-    else if(cmd == "load") shell.load(tokens);
-    else if(cmd == "update") shell.update(tokens);
-    else if(cmd == "delete") shell.entryDelete(tokens);
-    else if(cmd == "list") shell.list();
-    else if(cmd == "ciphers") shell.listCiphers();
-    else if(cmd == "exit") { 
-      shell.close();
-      shell.print_line("Goodbye!");
-      break;
-    }
-    else if(cmd == "help") shell.help();
-    else {
+    if(!shell.execute(cmd, tokens)) {
       shell.print_line("Invalid command. Check \"help\" for a list of commands");
     }
   }

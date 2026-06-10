@@ -154,7 +154,7 @@ namespace clib {
       new (temp.data + temp.count) T(list[i]);
       temp.count ++;
     }
-    *this = static_cast<T&&>(temp);
+    *this = static_cast<List<T>&&>(temp);
  };
 
   template<typename T>
