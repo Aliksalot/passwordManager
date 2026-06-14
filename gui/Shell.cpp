@@ -179,7 +179,6 @@ namespace gui {
           shell.print_line("Too many arguments: Invalid usage -> " + cmd.usage);
         }
 
-        //TODO pagination
         shell.paginate<const core::PasswordEntry*>
         (matches, [](Shell& shell, const core::PasswordEntry* const& entry) {
           shell.print_line(
@@ -254,7 +253,6 @@ namespace gui {
           return;
         }
 
-        //TODO
         shell.paginate<const core::PasswordView*>
         (shell.pm.list(), [](Shell& shell, const core::PasswordView* const& entry) {
           shell.print_line(entry->getWebsite() + "\t" + entry->getUsername());

@@ -3,7 +3,7 @@
 #include"../utils/mystring.h"
 
 namespace core {
-  struct PasswordView {
+  class PasswordView {
   protected:
     clib::Text website;
     clib::Text username;

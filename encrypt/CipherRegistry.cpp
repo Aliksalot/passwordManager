@@ -14,7 +14,7 @@
 namespace encrypt {
 
   CipherRegistry::CipherRegistry() {
-    add(new TestCipherFactory());
+    //add(new TestCipherFactory());
     add(new HillCipherFactory());
     add(new CaesarCipherFactory());
     add(new VignereCipherFactory());
