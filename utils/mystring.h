@@ -111,9 +111,11 @@ namespace clib{
   inline Text& Text::operator+=(const char* s) {
     return *this += Text(s);
   }
-  inline Text operator+(const Text& a, const Text& b) {
-    Text result = a;
-    return result += b;
+  inline Text operator+(Text a, const Text& b) {
+    return a += b;
+  }
+  inline Text operator+(Text a, long long n) {
+    return a += Text::fromInt(n);
   }
   inline bool Text::operator==(const Text& s) const {
     if(size() != s.size()) return false;

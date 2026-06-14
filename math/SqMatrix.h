@@ -13,29 +13,29 @@ namespace math {
    * Which isn't explicitly defined in the class/function name/names,
    * so that they stay shorter and easier to type out
    */
-  using Datadarray = clib::darray<clib::darray<Z26>>;
+  using DataList = clib::darray<clib::darray<Z26>>;
 
   class SqMatrix {
   private:
     void calculateInverse();
 
-    SqMatrix(Datadarray& data, Datadarray& inverse);
+    SqMatrix(DataList& data, DataList& inverse);
 
-    Datadarray data;
-    Datadarray inverse;
+    DataList data;
+    DataList inverse;
 
-    static clib::Text datadarrayToReadable(const Datadarray& data);
-    static clib::darray<Z26> applyDatadarray(
-      const Datadarray& data,
+    static clib::Text dataListToReadable(const DataList& data);
+    static clib::darray<Z26> applyDataList(
+      const DataList& data,
       const clib::darray<Z26>& vec
     );
 
   public:
     SqMatrix() = delete;
-    SqMatrix(const Datadarray& data);
+    SqMatrix(const DataList& data);
 
-    const Datadarray& asdarray() const;
-    const Datadarray& inverseAsdarray() const;
+    const DataList& asdarray() const;
+    const DataList& inverseAsdarray() const;
 
     clib::Text toReadableText() const;
     clib::Text toReadableTextInverse() const;
@@ -45,22 +45,22 @@ namespace math {
     clib::darray<Z26> apply(const clib::darray<Z26>& vec) const;
     clib::darray<Z26> applyInverse(const clib::darray<Z26>& vec) const;
 
-    static Datadarray identity(unsigned dim);
+    static DataList identity(unsigned dim);
     static SqMatrix deserialize(const clib::Text& raw);
   };
 
 
-  inline SqMatrix::SqMatrix(Datadarray& data, Datadarray& inverse)
+  inline SqMatrix::SqMatrix(DataList& data, DataList& inverse)
     : 
     data(
-      static_cast<Datadarray&&>(data)
+      static_cast<DataList&&>(data)
     ),
     inverse(
-      static_cast<Datadarray&&>(inverse)
+      static_cast<DataList&&>(inverse)
     ) { };
 
   inline clib::Text SqMatrix::toReadableText() const {
-    return datadarrayToReadable(data);
+    return dataListToReadable(data);
   }
 
   inline clib::Text SqMatrix::serialize() const {
@@ -93,7 +93,7 @@ namespace math {
     //Serializer appends extra &
     tokens.pop();
 
-    Datadarray matrix, inverse;
+    DataList matrix, inverse;
     std::size_t dim = tokens[0].toInt();
 
     std::size_t expectedTokenCount = 1 + 2*dim*dim;
@@ -123,11 +123,11 @@ namespace math {
   }
 
   inline clib::Text SqMatrix::toReadableTextInverse() const {
-    return datadarrayToReadable(inverse);
+    return dataListToReadable(inverse);
   }
 
-  inline Datadarray SqMatrix::identity(unsigned dim) {
-    Datadarray l;
+  inline DataList SqMatrix::identity(unsigned dim) {
+    DataList l;
     for(unsigned i = 0; i < dim; i ++) {
       l.add(clib::darray<Z26>());
       for(unsigned j = 0; j < dim; j ++) {
@@ -138,7 +138,7 @@ namespace math {
     return l;
   }
 
-  inline SqMatrix::SqMatrix(const Datadarray& data): data(data) {
+  inline SqMatrix::SqMatrix(const DataList& data): data(data) {
     std::size_t rCount = data.size();
     for(auto& row: data) {
       //TODO custom error
@@ -148,20 +148,20 @@ namespace math {
     calculateInverse();
   }
 
-  inline const Datadarray& SqMatrix::asdarray() const {
+  inline const DataList& SqMatrix::asdarray() const {
     return data;
   }
-  inline const Datadarray& SqMatrix::inverseAsdarray() const {
+  inline const DataList& SqMatrix::inverseAsdarray() const {
     return inverse;
   }
 
   inline void SqMatrix::calculateInverse() {
 
-    Datadarray thisDataCopy = this->data;
+    DataList thisDataCopy = this->data;
 
     std::size_t dim = thisDataCopy.size();
 
-    Datadarray inverted = identity(dim);
+    DataList inverted = identity(dim);
 
     clib::darray<std::size_t> usedColumns;
 
@@ -201,8 +201,8 @@ namespace math {
     this->inverse = inverted;
   }
 
-  inline clib::darray<Z26> SqMatrix::applyDatadarray(
-    const Datadarray& data,
+  inline clib::darray<Z26> SqMatrix::applyDataList(
+    const DataList& data,
     const clib::darray<Z26>& vec
   ) {
     
@@ -231,13 +231,13 @@ namespace math {
   }
 
   inline clib::darray<Z26> SqMatrix::apply(const clib::darray<Z26>& vec) const {
-    return applyDatadarray(data, vec);
+    return applyDataList(data, vec);
   }
   inline clib::darray<Z26> SqMatrix::applyInverse(const clib::darray<Z26>& vec) const {
-    return applyDatadarray(inverse, vec);
+    return applyDataList(inverse, vec);
   }
 
-  inline clib::Text SqMatrix::datadarrayToReadable(const Datadarray& data)  {
+  inline clib::Text SqMatrix::dataListToReadable(const DataList& data)  {
     clib::Text res;
     for(auto& row: data) {
       for(auto& el: row) {

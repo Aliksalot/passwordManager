@@ -8,6 +8,8 @@
 
 namespace gui {
   
+  constexpr unsigned PAGINATION_ITEMS_PER_PAGE = 5;
+
   using TokenList = clib::darray<clib::Text>;
 
   class Shell {
@@ -20,6 +22,12 @@ namespace gui {
 
     bool promptConfirm();
     clib::Text promptForPassword();
+
+    void clearScreen() const;
+
+    template<typename T>
+    void paginate(const clib::darray<T>& items, void (*printItem)(Shell&, const T&));
+
   public:
     Shell();
 
@@ -33,4 +41,5 @@ namespace gui {
     void print_line(clib::Text s) const;
     std::istream& in();
   };
+
 }

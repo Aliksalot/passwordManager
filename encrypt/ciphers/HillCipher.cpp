@@ -60,7 +60,7 @@ namespace encrypt {
       clib::getLine(shell.in(), dimStr);
       std::size_t dim = dimStr.toInt();
 
-      math::Datadarray dl;
+      math::DataList dl;
       for(std::size_t r = 0; r < dim; r++) {
         dl.add(clib::darray<math::Z26>());
         shell.print_line("Enter row " + clib::Text::fromInt(r) + " (Separate with spaces): ");

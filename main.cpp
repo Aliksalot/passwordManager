@@ -47,7 +47,7 @@ void test() {
     "password"
   );
 
-  math::Datadarray dl;
+  math::DataList dl;
   dl.add(clib::darray<math::Z26>());
   dl.add(clib::darray<math::Z26>());
   dl[0].add(3);

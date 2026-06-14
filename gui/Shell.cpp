@@ -9,7 +9,50 @@
 
 #include<iostream>
 
+
 namespace gui {
+
+  void Shell::clearScreen() const {
+    print("\033[2J\033[H");
+  }
+
+  template<typename T>
+  void Shell::paginate(
+      const clib::darray<T>& items,
+      void (*printItem)(Shell&, const T&)
+  ) {
+
+    const unsigned total = items.size();
+    const unsigned pageCount = (total + PAGINATION_ITEMS_PER_PAGE - 1)
+                                / PAGINATION_ITEMS_PER_PAGE;
+    unsigned currentPage = 0;
+
+    while(total > 0) {
+      
+      std::size_t from = currentPage * PAGINATION_ITEMS_PER_PAGE;
+      std::size_t to = from + PAGINATION_ITEMS_PER_PAGE;
+      if(to > total) to = total;
+
+      clearScreen();
+      print_line("--------------------");
+      for(std::size_t i = from; i < to; i ++) {
+        printItem(*this, items[i]);
+      }
+      print_line("--------------------");
+
+      print_line(clib::Text("Current Page: ") + (currentPage + 1) + "/" + pageCount
+          + " | Total entries: " + total);
+
+      if(pageCount == 1) return;
+      print_line("(n)ext (q)uit (p)revious");
+      
+      clib::Text input;
+      clib::getLine(in(), input);
+      if(input[0] == 'n' && currentPage < pageCount - 1) currentPage ++;
+      if(input[0] == 'p' && currentPage > 0) currentPage --;
+      if(input[0] == 'q') break;
+    }
+  }
 
   bool Shell::isRunning() const {
     return running;
@@ -136,9 +179,14 @@ namespace gui {
           shell.print_line("Too many arguments: Invalid usage -> " + cmd.usage);
         }
 
-        for(auto& entry: matches) {
-          shell.print_line(entry->getUsername() + "\t" + entry->getCipher()->decrypt(entry->getPasswordEncrypted()));
-        }
+        //TODO pagination
+        shell.paginate<const core::PasswordEntry*>
+        (matches, [](Shell& shell, const core::PasswordEntry* const& entry) {
+          shell.print_line(
+              entry->getUsername() +
+                "\t" + entry->getCipher()->decrypt(entry->getPasswordEncrypted()
+          ));
+        });
       }
     ));
 
@@ -206,12 +254,11 @@ namespace gui {
           return;
         }
 
-        clib::darray<const core::PasswordView*> passwords =
-          shell.pm.list();
-
-        for(auto& pass: passwords) {
-          shell.print_line(pass->getWebsite() + "\t" + pass->getUsername());
-        }
+        //TODO
+        shell.paginate<const core::PasswordView*>
+        (shell.pm.list(), [](Shell& shell, const core::PasswordView* const& entry) {
+          shell.print_line(entry->getWebsite() + "\t" + entry->getUsername());
+        });
       }
     ));
 
@@ -300,6 +347,15 @@ namespace gui {
         }
       }
     ));
+
+    commands.add(Command(
+      "clear",
+      "clear",
+      "Clears the screen",
+      [](Command&, Shell& shell, const clib::darray<clib::Text>&) {
+        shell.clearScreen();
+      })
+    );
   }
 
   bool Shell::promptConfirm() {
