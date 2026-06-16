@@ -33,7 +33,6 @@ namespace gui {
       std::size_t to = from + PAGINATION_ITEMS_PER_PAGE;
       if(to > total) to = total;
 
-      clearScreen();
       print_line("--------------------");
       for(std::size_t i = from; i < to; i ++) {
         printItem(*this, items[i]);
