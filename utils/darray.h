@@ -2,7 +2,6 @@
 
 #include<cstdlib>
 #include<stdexcept>
-#include"memory.h"
 
 namespace clib {
 
@@ -52,7 +51,8 @@ namespace clib {
       bool indexInBounds(std::size_t index) const;
       bool full() const;
 
-      /**Destroys all objects in data and sets count to 0. Doesn't delete data*/
+      /**Destroys all objects in data, starting from std::size_t st
+       * and sets count to 0. DOESN'T free memory, allocated in data[] */
       void clear_data(std::size_t st = 0);
       /**Calls delete on data. Does NOT destruct T objects, only frees memory*/
       void delete_data();
@@ -63,7 +63,7 @@ namespace clib {
       T* construct_data(std::size_t size);
   };
 
-  //-------DEFINITIONS------
+  //-------DECLARATIONS------
 
   template<typename T>
   void darray<T>::clear() {
@@ -148,14 +148,18 @@ namespace clib {
   template<typename T>
   void darray<T>::extend(const darray<T>& list) {
 
-    darray<T> temp(*this);
-    temp.reserve(count + list.size());
-    for(std::size_t i = 0; i < list.size(); i ++){
-      new (temp.data + temp.count) T(list[i]);
-      temp.count ++;
+    reserve(count + list.size());
+    std::size_t initialCount = count;
+    try{
+      for(std::size_t i = 0; i < list.size(); i ++){
+        new (data + count) T(list[i]);
+        count ++;
+      }
+    }catch(...) {
+      clear_data(initialCount);
+      throw;
     }
-    *this = static_cast<darray<T>&&>(temp);
- };
+   };
 
   template<typename T>
   darray<T>::darray(const darray& l) {
