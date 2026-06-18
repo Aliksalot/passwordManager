@@ -55,9 +55,16 @@ namespace encrypt{
   }
   CaesarCipher* CaesarCipherFactory::fromShell(gui::Shell& shell) const {
     clib::Text input;
-    shell.print_line("Ender caesar cipher shift (whole number): ");
-    std::cin >> input;
-    return new CaesarCipher(atoi(input.raw()));
+    do{
+      shell.print_line("Enter caesar cipher shift (whole number): ");
+      clib::getLine(shell.in(), input);
+      if(input.trimInPlace().isValidInt()) {
+        return new CaesarCipher(input.toInt());
+      }
+      shell.print_line("Whole number!!!!");
+    }while(1);
+
+    throw std::logic_error("unreachable");
   }
   clib::Text CaesarCipherFactory::type() const {
     return "caesar_cipher";
