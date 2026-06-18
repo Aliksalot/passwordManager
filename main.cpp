@@ -1,4 +1,5 @@
 #include<iostream>
+#include<stdexcept>
 #include"./core/PasswordFile.h"
 #include"./encrypt/ciphers/CaesarCipher.h"
 #include"./encrypt/ciphers/TestCipher.h"
@@ -11,7 +12,7 @@
 
 #include"./gui/Shell.h"
 
-void run() {
+int run() {
   char lineRaw[1024];
   gui::Shell shell;
 
@@ -20,7 +21,7 @@ void run() {
 
     if(!shell.isRunning()) {
       shell.print_line("Goodbye!");
-      exit(0);
+      return 0;
     }
     shell.in().getline(lineRaw, 1024);
 
@@ -35,6 +36,8 @@ void run() {
 
     shell.execute(cmd, tokens);
   }
+
+  throw std::logic_error("Unreachable");
 }
 
 void test() {
@@ -78,7 +81,7 @@ void test() {
 }
 
 int main(void) {
-  run();
+  return run();
 
   return 0;
 }
