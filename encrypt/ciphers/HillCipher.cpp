@@ -5,6 +5,7 @@
 #include"../../math/RemRing.h"
 #include"../../gui/Shell.h"
 #include"../../utils/exceptions.h"
+#include"../../utils/mystring.h"
 
 namespace encrypt {
   HillCipher::HillCipher(math::SqMatrix m): m(m) { };
@@ -53,11 +54,23 @@ namespace encrypt {
     return new HillCipher(math::SqMatrix::deserialize(args[0]));
   }
 
+  /* Since proccess of initializing a HillCipher is quite annoying, it can be aborted and
+   * a nullptr can be returned. Must be handled */
   HillCipher* HillCipherFactory::fromShell(gui::Shell& shell) const {
+    //TODO maybe its better someone else to be responsible for building a matrix from Shell.
+    //Perhaps matrix factory of sorts
     while(1) {
-      shell.print_line("Enter matrix dimension: ");
+      shell.print_line("Enter matrix dimension (Or type \"abort\" to abort): ");
       clib::Text dimStr;
       clib::getLine(shell.in(), dimStr);
+      dimStr.trimInPlace();
+      if(dimStr == "abort") {
+        return nullptr;
+      }
+      if(!dimStr.isValidInt()) {
+        shell.print_line("Should be valid integer!");
+        continue;
+      }
       std::size_t dim = dimStr.toInt();
 
       math::DataList dl;
@@ -66,14 +79,27 @@ namespace encrypt {
         shell.print_line("Enter row " + clib::Text::fromInt(r) + " (Separate with spaces): ");
         clib::Text line;
         clib::getLine(shell.in(), line);
-        auto tokens = line.split(' ');
+        auto tokens = line.trimInPlace().split(' ');
         if(tokens.size() != dim) {
           shell.print_line("Row must have exactly dim elements");
           r--;
+          dl.pop();
           continue;
         }
+        
+        bool result = true;
         for(std::size_t c = 0; c < dim; c++) {
+          if(!tokens[c].isValidInt()) {
+            shell.print_line("All elements should be valid integers!");
+            result = false;
+            break;
+          }
           dl[r].add((int)tokens[c].toInt());
+        }
+        if(!result) { 
+          r --;
+          dl.pop();
+          continue;
         }
       }
       try{
@@ -81,6 +107,8 @@ namespace encrypt {
         return new HillCipher(m);
       }catch(const utils::MathError& e){
         shell.print_line("Matrix is probably not invertable. Try again.");
+      }catch(const std::runtime_error& e) {
+        shell.print_line(e.what());
       }
     }
   }

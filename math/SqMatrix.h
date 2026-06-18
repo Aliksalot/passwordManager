@@ -34,8 +34,8 @@ namespace math {
     SqMatrix() = delete;
     SqMatrix(const DataList& data);
 
-    const DataList& asdarray() const;
-    const DataList& inverseAsdarray() const;
+    const DataList& asList() const;
+    const DataList& inverseAsList() const;
 
     clib::Text toReadableText() const;
     clib::Text toReadableTextInverse() const;
@@ -141,17 +141,17 @@ namespace math {
   inline SqMatrix::SqMatrix(const DataList& data): data(data) {
     std::size_t rCount = data.size();
     for(auto& row: data) {
-      //TODO custom error
+      //TODO custom error maybe
       if(row.size() != rCount)
         throw std::runtime_error("Matrix must be square, and be a matrix!");
     }
     calculateInverse();
   }
 
-  inline const DataList& SqMatrix::asdarray() const {
+  inline const DataList& SqMatrix::asList() const {
     return data;
   }
-  inline const DataList& SqMatrix::inverseAsdarray() const {
+  inline const DataList& SqMatrix::inverseAsList() const {
     return inverse;
   }
 

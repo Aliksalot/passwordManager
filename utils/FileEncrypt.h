@@ -2,7 +2,7 @@
 
 namespace utils {
   inline clib::Text encryptFile(const clib::Text& raw, clib::Text password)  {
-    if(password.trim(' ').empty()) {
+    if(password.trimInPlace(' ').empty()) {
       throw std::runtime_error("Empty password is not permitted");
     }
     clib::Text out = raw;

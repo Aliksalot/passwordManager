@@ -26,9 +26,7 @@ void run() {
 
     clib::Text line = lineRaw;
 
-    line.trim(' ');
-
-    clib::darray<clib::Text> tokens = line.split(' ');
+    clib::darray<clib::Text> tokens = line.trim().split(' ');
 
     if(tokens.empty()) continue;
 

@@ -14,14 +14,19 @@ namespace core {
     delete currentFile;
   }
 
-  void PasswordManager::createFile(
+  bool PasswordManager::createFile(
     const clib::Text& fname,
     encrypt::Cipher* defaultCipher,
     const clib::Text& password
   ) {
     PasswordFile f(fname);
     
-    f.createFile(defaultCipher, password);
+    try{
+      f.createFile(defaultCipher, password);
+    }catch(const utils::FileError& e) {
+      return false;
+    }
+    return true;
   }
 
   void PasswordManager::openFile(const clib::Text& fname, const clib::Text& password) {

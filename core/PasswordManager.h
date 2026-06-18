@@ -21,7 +21,7 @@ namespace core{
   public:
     PasswordManager();
 
-    void createFile(
+    bool createFile(
       const clib::Text& fname,
       encrypt::Cipher* defaultCipher,
       const clib::Text& password

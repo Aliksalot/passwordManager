@@ -40,9 +40,7 @@ namespace encrypt {
       }
     }
 
-    throw utils::InvalidCipherTypeError(clib::Text("Invalid cipher: ") + type + "\nNote: If you \
-are a developer and think this is a mistake, check if you have forgotten to register a new \
-CipherType");
+    throw utils::InvalidCipherTypeError(clib::Text("Invalid cipher: ") + type);
   }
 
   const CipherRegistry& CipherRegistry::get() {

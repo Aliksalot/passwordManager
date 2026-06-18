@@ -28,9 +28,11 @@ namespace clib{
 
     long long toInt() const;
     static Text fromInt(long long i);
+    bool isValidInt() const;
 
     Text& insert(std::size_t at, char c);
-    Text& trim(char c);
+    Text trim(char c = ' ') const;
+    Text& trimInPlace(char c = ' ');
 
     darray<Text> split(char c) const;
 
@@ -45,7 +47,7 @@ namespace clib{
     darray<char> l;
   };
 
-  inline Text& Text::trim(char c) {
+  inline Text& Text::trimInPlace(char c) {
     l.pop();
 
     while(!l.empty() && l[0] == c) {
@@ -58,6 +60,11 @@ namespace clib{
 
     l.add('\0');
     return *this;
+  }
+
+  inline Text Text::trim(char c) const {
+    Text trimmed(*this);
+    return trimmed.trimInPlace(c);
   }
 
   inline void Text::clear() {
@@ -136,8 +143,16 @@ namespace clib{
     return !(*this == s);
   }
 
+  inline bool Text::isValidInt() const {
+    if(size() == 0 || (size() == 1 && l[0] == '-')) return false;
+    for(std::size_t i = 0; i < size(); i ++) {
+      if(l[i] < '0' || l[i] > '9') return false;
+    }
+    return true;
+  }
+
   inline long long Text::toInt() const {
-    if(size() == 0 || (size() == 1 && l[0] == '-'))
+    if(!isValidInt())
       throw std::invalid_argument("Not an integer");
     
     signed sign = 1;
@@ -150,9 +165,6 @@ namespace clib{
 
     long long r = 0;
     for(; i < size(); i ++) {
-      if(l[i] < '0' || l[i] > '9')
-        throw std::invalid_argument("Not an integer");
-
       r = r * 10 + (l[i] - '0');
     }
 
@@ -236,6 +248,7 @@ namespace clib{
     }
     return stream;
   }
+
 
 }
 

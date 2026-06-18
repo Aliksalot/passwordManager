@@ -106,7 +106,13 @@ namespace gui {
           encrypt::Cipher* defaultCipher = encrypt::CipherRegistry::get()
             .byType(t[1])->fromShell(shell);
 
-          shell.pm.createFile(t[0], defaultCipher, t[2]);
+          //It's up to the fromShell implementation to say what went wrong
+          if(defaultCipher == nullptr) return;
+
+          if(!shell.pm.createFile(t[0], defaultCipher, t[2])) {
+            shell.print_line("Couldn't create file! File name is taken (most likely).");
+            return;
+          }
 
           shell.print_line("File created successfully!");
 
@@ -133,16 +139,20 @@ namespace gui {
           if(t.size() <= 2) {
             shell.print_line("Too few arguments: Invalid usage -> " + cmd.usage);
           }else if(t.size() == 3) {
-            shell.pm.newPassword(t[0], t[1], t[2]);
-            shell.print_line("Added new entry!");
+            if(shell.pm.newPassword(t[0], t[1], t[2])) {
+              shell.print_line("Added new entry!");
+            }
           }else if(t.size() == 4) {
             encrypt::Cipher* cipher = encrypt::CipherRegistry::get()
               .byType(t[2])->fromShell(shell);
 
-            if(!shell.pm.newPassword(t[0], t[1], t[3], cipher)) {
-              shell.print_line("Couldn't add new password entry. ");
-            }else {
+            //It's up to the fromShell implementation to say what went wrong
+            if(cipher == nullptr) return;
+
+            if(shell.pm.newPassword(t[0], t[1], t[3], cipher)) {
               shell.print_line("Added new entry!");
+            }else {
+              shell.print_line("Couldn't add new password entry. ");
             }
           }else {
             shell.print_line("Too many arguments: Invalid usage -> " + cmd.usage);
@@ -395,7 +405,7 @@ namespace gui {
 
   void Shell::execute(clib::Text s, const TokenList& tokens) {
 
-    if(s.trim(' ').empty()) {
+    if(s.trimInPlace(' ').empty()) {
       return;
     }
 

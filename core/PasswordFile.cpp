@@ -111,6 +111,11 @@ namespace core {
     const clib::Text& password
   ) {
 
+    std::ifstream fileInput(path.raw(), std::ios::binary);
+
+    if(fileInput)
+      throw utils::FileError("File already exists!");
+
     delete defaultCipher;
     defaultCipher = cipher;
 

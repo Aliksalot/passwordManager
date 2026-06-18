@@ -87,6 +87,13 @@ namespace encrypt {
 
     clib::getLine(shell.in(), fpath);
 
+    std::ifstream file(fpath.raw());
+
+    if(!file) {
+      shell.print_line("TextCode requires an existing file!");
+      return nullptr;
+    }
+
     return new TextCode(fpath);
   }
 
