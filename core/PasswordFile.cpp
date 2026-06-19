@@ -60,19 +60,26 @@ namespace core {
 
     for(std::size_t i = 0; i < passwords.size(); i ++) {
       PasswordEntry& p = passwords[i];
-      if(p.getWebsite() == website && p.getUsername() == username)
+      if(p.getWebsite() == website && p.getUsername() == username) {
+        delete cipher;
         throw utils::PasswordModifyError(
           "Error when creating new user - Person with such credentials already exists!"
         );
+      }
     }
 
     auto passCipher = cipher == nullptr ? defaultCipher->clone() : cipher;
 
-    passwords.add(PasswordEntry(
-      website, username,
-      passCipher->encrypt(password),
-      passCipher
-    ));
+    try{
+      passwords.add(PasswordEntry(
+        website, username,
+        passCipher->encrypt(password),
+        passCipher
+      ));
+    }catch(...) {
+      delete passCipher;
+      throw;
+    }
 
     hasUnsaved = true;
 

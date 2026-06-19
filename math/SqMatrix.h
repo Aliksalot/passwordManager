@@ -19,7 +19,7 @@ namespace math {
   private:
     void calculateInverse();
 
-    SqMatrix(DataList& data, DataList& inverse);
+    SqMatrix(DataList&& data, DataList&& inverse);
 
     DataList data;
     DataList inverse;
@@ -50,7 +50,7 @@ namespace math {
   };
 
 
-  inline SqMatrix::SqMatrix(DataList& data, DataList& inverse)
+  inline SqMatrix::SqMatrix(DataList&& data, DataList&& inverse)
     : 
     data(
       static_cast<DataList&&>(data)
@@ -119,7 +119,10 @@ namespace math {
       throw;
     }
 
-    return SqMatrix(matrix, inverse);
+    return SqMatrix(
+      static_cast<DataList&&>(matrix),
+      static_cast<DataList&&>(inverse)
+    );
   }
 
   inline clib::Text SqMatrix::toReadableTextInverse() const {
@@ -165,37 +168,49 @@ namespace math {
 
     DataList inverted = identity(dim);
 
-    clib::darray<std::size_t> usedColumns;
+    for(std::size_t c = 0; c < dim; c ++) {
 
-    for(std::size_t r = 0; r < dim; r ++) {
-
-      signed pivotColumn = -1;
-      for(std::size_t c = 0; c < dim; c ++) {
-        if(
-          thisDataCopy[r][c].hasInverse() &&
-          !usedColumns.contains(c)
-        ) {
-          pivotColumn = c;
-          usedColumns.add(pivotColumn);
+      signed pivotRow = -1;
+      for(std::size_t r = c; r < dim; r ++) {
+        if(thisDataCopy[r][c].hasInverse()) {
+          pivotRow = r;
           break;
         }
       }
-      if(pivotColumn < 0)
-        throw utils::MathError("Matrix not invertable!");
-      
-      Z26 pivotInverse = thisDataCopy[r][pivotColumn].inverse();
 
-      for(std::size_t c = 0; c < dim; c ++) {
-        thisDataCopy[r][c] *= pivotInverse;
-        inverted[r][c] *= pivotInverse;
+      if(pivotRow < 0) {
+        throw utils::MathError("Matrix not invertable!");
       }
 
-      for(std::size_t otherRow = 0; otherRow < dim; otherRow ++) {
-        if(otherRow == r) continue;
-        Z26 scaler = -thisDataCopy[otherRow][pivotColumn];
-        for(std::size_t c = 0; c < dim; c ++) {
-          thisDataCopy[otherRow][c] += thisDataCopy[r][c] * scaler;
-          inverted[otherRow][c] += inverted[r][c] * scaler;
+      if((std::size_t)pivotRow != c) {
+        //swap
+        for(std::size_t i = 0; i < dim; i ++) {
+          Z26 temp = thisDataCopy[pivotRow][i];
+          thisDataCopy[pivotRow][i] = thisDataCopy[c][i];
+          thisDataCopy[c][i] = temp;
+          temp = inverted[pivotRow][i];
+          inverted[pivotRow][i] = inverted[c][i];
+          inverted[c][i] = temp;
+        }
+      }
+
+      //Now we have a guaranteed pivot at [c][c] - a invertable element
+      
+      Z26 pivotInverse = thisDataCopy[c][c].inverse();
+      for(std::size_t i = 0; i < dim; i ++) {
+        thisDataCopy[c][i] *= pivotInverse;
+        inverted[c][i] *= pivotInverse;
+      }
+
+      //At row c we have our pivot row -> don't touch it!
+      //To all other rows we add the additive inverse 
+      for(std::size_t r = 0; r < dim; r ++) {
+        if(r == c) continue;
+        
+        Z26 scaler = -thisDataCopy[r][c];
+        for(std::size_t i = 0; i < dim; i ++) {
+          thisDataCopy[r][i] += thisDataCopy[c][i] * scaler;
+          inverted[r][i] += inverted[c][i] * scaler;
         }
       }
     }
@@ -209,14 +224,14 @@ namespace math {
   ) {
     
     std::size_t dim = data.size();
-    std::size_t initialSize = vec.size();
+
+    if(vec.size() % dim != 0) {
+      throw utils::MathError(
+        clib::Text("Couldn't apply matrix. Token list size MUST be divisble by the dimention of the matrix (It's ") + dim + ")."
+      );
+    }
 
     clib::darray<Z26> result;
-
-    //Pad, so that matrix multiplication is valid
-    while(vec.size() % dim != 0) {
-      vec.add(Z26(0));
-    }
 
     for(std::size_t split = 0; split < vec.size() / dim; split ++) {
       for(std::size_t row = 0; row < dim; row ++) {
@@ -226,11 +241,6 @@ namespace math {
         }
         result.add(sum);
       }
-    }
-
-    //Remove padding
-    while(result.size() != initialSize) {
-      result.pop();
     }
 
     return result;

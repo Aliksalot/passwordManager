@@ -82,6 +82,4 @@ void test() {
 
 int main(void) {
   return run();
-
-  return 0;
 }

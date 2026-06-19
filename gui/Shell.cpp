@@ -241,11 +241,11 @@ namespace gui {
           shell.print_line("Warning - you are about to delete all passwords for website " + website + ". Are you sure?");
           if(shell.promptConfirm()) {
             shell.pm.deletePassword(website);
-            shell.print_line("Delete successfull!");
+            shell.print_line("Delete successful!");
           }
         }else if(t.size() == 2) {
           shell.pm.deletePassword(t[0], t[1]);
-          shell.print_line("Delete successfull!");
+          shell.print_line("Delete successful!");
         }else{
           shell.print_line("Too many arguments: Invalid usage -> " + cmd.usage);
         }
