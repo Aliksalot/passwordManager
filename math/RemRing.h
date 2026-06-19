@@ -12,7 +12,8 @@ namespace math {
 
     RemRing& operator+=(const RemRing& other);
     RemRing& operator-=(const RemRing& other);
-    bool operator==(const RemRing& other);
+    bool operator==(const RemRing& other) const;
+    bool operator!=(const RemRing& other) const;
     RemRing& operator*=(const RemRing& other);
     RemRing& operator/=(const RemRing& other);
 
@@ -43,7 +44,7 @@ namespace math {
 
   template<int Mod>
   inline bool RemRing<Mod>::isZeroDivisor() const {
-    
+
     int q = Mod, d = n;
 
     while (d != 0) {
@@ -101,8 +102,13 @@ namespace math {
   }
 
   template<int Mod>
-  inline bool RemRing<Mod>::operator==(const RemRing<Mod>& other) {
+  inline bool RemRing<Mod>::operator==(const RemRing<Mod>& other) const {
     return n == other.n;
+  }
+
+  template<int Mod>
+  inline bool RemRing<Mod>::operator!=(const RemRing<Mod>& other) const {
+    return !(n == other.n);
   }
 
   template<int Mod>

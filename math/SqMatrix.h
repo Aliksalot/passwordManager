@@ -27,11 +27,11 @@ namespace math {
     static clib::Text dataListToReadable(const DataList& data);
     static clib::darray<Z26> applyDataList(
       const DataList& data,
-      const clib::darray<Z26>& vec
+      clib::darray<Z26> vec
     );
 
   public:
-    SqMatrix() = delete;
+
     SqMatrix(const DataList& data);
 
     const DataList& asList() const;
@@ -140,10 +140,11 @@ namespace math {
 
   inline SqMatrix::SqMatrix(const DataList& data): data(data) {
     std::size_t rCount = data.size();
+    if(rCount == 0)
+        throw utils::MathError("Matrix dimention can't be 0");
     for(auto& row: data) {
-      //TODO custom error maybe
       if(row.size() != rCount)
-        throw std::runtime_error("Matrix must be square, and be a matrix!");
+        throw utils::MathError("Matrix must be square, and be a matrix!");
     }
     calculateInverse();
   }
@@ -151,6 +152,7 @@ namespace math {
   inline const DataList& SqMatrix::asList() const {
     return data;
   }
+
   inline const DataList& SqMatrix::inverseAsList() const {
     return inverse;
   }
@@ -203,28 +205,32 @@ namespace math {
 
   inline clib::darray<Z26> SqMatrix::applyDataList(
     const DataList& data,
-    const clib::darray<Z26>& vec
+    clib::darray<Z26> vec
   ) {
     
-    clib::darray<clib::darray<Z26>> vectorSplits;
-    for(std::size_t i = 0; i < vec.size() / data.size(); i ++) {
-      vectorSplits.add(clib::darray<Z26>());
-      for(std::size_t j = 0; j < data.size(); j ++) {
-        vectorSplits[i].add(vec[i * data.size() + j]);
-      }
-    }
-    
     std::size_t dim = data.size();
+    std::size_t initialSize = vec.size();
 
     clib::darray<Z26> result;
-    for(std::size_t split = 0; split < vec.size() / data.size(); split ++) {
+
+    //Pad, so that matrix multiplication is valid
+    while(vec.size() % dim != 0) {
+      vec.add(Z26(0));
+    }
+
+    for(std::size_t split = 0; split < vec.size() / dim; split ++) {
       for(std::size_t row = 0; row < dim; row ++) {
-        Z26 sum;
+        Z26 sum(0);
         for(std::size_t col = 0; col < dim; col ++) {
-          sum += data[row][col] * vectorSplits[split][col];
+          sum += data[row][col] * vec[split * dim + col];
         }
         result.add(sum);
       }
+    }
+
+    //Remove padding
+    while(result.size() != initialSize) {
+      result.pop();
     }
 
     return result;

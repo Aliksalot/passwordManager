@@ -73,6 +73,11 @@ namespace encrypt {
       }
       std::size_t dim = dimStr.toInt();
 
+      if(dim == 0) {
+        shell.print_line("Matrix dimention can't be 0");
+        continue;
+      }
+
       math::DataList dl;
       for(std::size_t r = 0; r < dim; r++) {
         dl.add(clib::darray<math::Z26>());
@@ -106,7 +111,7 @@ namespace encrypt {
         math::SqMatrix m(dl); 
         return new HillCipher(m);
       }catch(const utils::MathError& e){
-        shell.print_line("Matrix is probably not invertable. Try again.");
+        shell.print_line(e.what());
       }catch(const std::runtime_error& e) {
         shell.print_line(e.what());
       }
