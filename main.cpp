@@ -13,9 +13,9 @@
 #include"./gui/Shell.h"
 
 int run() {
-  char lineRaw[1024];
   gui::Shell shell;
 
+  clib::Text line;
   shell.print_line("Welcome to password manager. If you are new type \"help\" for  a list of commands.");
   while(1) {
 
@@ -23,9 +23,7 @@ int run() {
       shell.print_line("Goodbye!");
       return 0;
     }
-    shell.in().getline(lineRaw, 1024);
-
-    clib::Text line = lineRaw;
+    clib::getLine(shell.in(), line);
 
     clib::darray<clib::Text> tokens = line.trim().split(' ');
 

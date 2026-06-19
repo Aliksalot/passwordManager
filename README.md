@@ -67,7 +67,7 @@ void PasswordFile::load(const clib::Text& password) {
  }
 ```
 
-от този вид. Масивът се създава в конструктура на ```gui::Shell```. Ползава от тази идея, е че добавянето на нови команди изисква променянето на кода на едно единствено място - конструктура на ```gui::Shell```. Ето ще дам пример как сме имплементирали командата ```load```
+от този вид. Масивът се създава в конструктура на ```gui::Shell```. Ползата от тази идея, е че добавянето на нови команди изисква променянето на кода на едно единствено място - конструктура на ```gui::Shell```. Ето ще дам пример как сме имплементирали командата ```load```
 
 ```cpp
     commands.add(Command(
@@ -87,13 +87,19 @@ void PasswordFile::load(const clib::Text& password) {
 Този  ```gui::Shell``` клас ни позволява изключително проста и лесна имплементация на цялата потребителска част. Самото изпълнение на командите се случва по следния начин
 
 ```cpp
-    shell.in().getline(lineRaw, 1024);
+  gui::Shell shell;
 
-    clib::Text line = lineRaw;
+  clib::Text line;
+  shell.print_line("Welcome to password manager. If you are new type \"help\" for  a list of commands.");
+  while(1) {
 
-    line.trim(' ');
+    if(!shell.isRunning()) {
+      shell.print_line("Goodbye!");
+      return 0;
+    }
+    clib::getLine(shell.in(), line);
 
-    clib::darray<clib::Text> tokens = line.split(' ');
+    clib::darray<clib::Text> tokens = line.trim().split(' ');
 
     if(tokens.empty()) continue;
 
@@ -101,6 +107,8 @@ void PasswordFile::load(const clib::Text& password) {
     tokens.remove(0);
 
     shell.execute(cmd, tokens);
+  }
+
 ```
 
 инструкции на потребителя се подават така
@@ -160,7 +168,7 @@ Entry-тата не отговарят за своето криптиране-р
 
 Мениджъра дефакто е връзката между потребителя и ```PasswordFile```. Той отговаря за отварянето и затварянето на файл за пароли, както и за извикване на подходящите CRUD заявки, зададени от потребителя, посредством ```gui::Shell``. Приложението поддържа един отворен файл във всеки един момент, като ```PasswordManager``` се грижи точно за това.
 
-**encypt**
+**encrypt**
 
 Програмата, както се изисква, поддържа HillCipher, TextCode , VignereCipher и CaesarCipher. Тези методи за шифриране са имплементирани чрез един абстрактен клас ```encrypt::Cipher``` и клас ```encrypt::CipherFactory```. Cipher задава основния шаблон за един шифър, който включва методи за криптиране, декриптиране, сериализиране и копиране (посредством ```clone() const``` метод). 
 
